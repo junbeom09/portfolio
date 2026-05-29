@@ -19,7 +19,14 @@ const projects = [
     year: '2024',
     mockup: '/mockups/newjins/index.html',
   },
-  { id: 3, title: 'Project 3', desc: '[프로젝트 설명 작성 예정]', tags: [], year: '20XX', mockup: null },
+  {
+    id: 3,
+    title: 'Artistry',
+    desc: '미술 프리랜서와 의뢰자를 연결하는 매칭 플랫폼. 작품 포트폴리오 게시와 카테고리 탐색, 1:1 채팅 의뢰, 카카오페이 결제, 소셜 로그인을 제공합니다.',
+    tags: ['JSP/Servlet', 'Java', 'Oracle', 'MyBatis'],
+    year: '2024',
+    mockup: '/mockups/artistry/index.html',
+  },
   { id: 4, title: 'Project 4', desc: '[프로젝트 설명 작성 예정]', tags: [], year: '20XX', mockup: null },
 ]
 

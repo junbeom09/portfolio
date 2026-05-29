@@ -1,0 +1,26 @@
+@charset "UTF-8";
+
+.sns-logo.google {
+  position: relative;
+  width: 80px; 
+  height: 80px;
+}
+
+.sns-logo.google::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("images/kakao-logo.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.g_id_signin {
+	display:flex;
+	position: absolute;
+	opacity: 0%
+}

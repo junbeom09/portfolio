@@ -1,0 +1,32 @@
+@charset "UTF-8";
+
+.myAccount{
+	border-radius: 15px;
+	height: 1000px;
+	width: 1200px;	
+	box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+	
+	
+}
+#myAccount{
+	
+	height: 1000px;
+	width: 1200px;	
+	font-size: 25px;
+	
+}
+#basic{
+	
+	text-align: right;
+	
+}
+#inputAccount{
+	
+	text-align: center;
+	
+}
+#postNum{
+	
+	text-align:left;
+	border: 15px;
+}

@@ -1,0 +1,124 @@
+.body {
+    background-color: #f8f9fa; /* 배경색 설정 */
+    font-family: 'Montserrat', sans-serif; /* 웹페이지 전체에 적용될 폰트 설정 */
+}
+
+/* 포트폴리오 및 아티스트 정보 섹션 스타일링 */
+.portfolio-artist-art setting-page, 
+.portfolio-artist-infomation setting-page{
+    background-color: #ffffff; /* 밝은 배경색 */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05); /* 섬세한 그림자 효과 */
+    padding: 2rem;
+    margin: 1rem auto;
+    max-width: 40rem; /* 너비 제한 */
+}
+
+/* 폼 제목 스타일링 */
+.heading-16 {
+    text-align: center;
+    color: #333;
+    font-size: 1.5rem; /* 제목 폰트 크기 */
+    margin-bottom: 1.5rem; /* 여백 설정 */
+}
+
+.heading-17 {
+    margin-bottom: 0.5rem; /* 여백 조정 */
+    display: block; /* 블록 레벨 요소로 설정 */
+}
+
+.select-field-2 {
+    width: 100%; /* 너비를 100%로 설정 */
+    box-sizing: border-box; /* 테두리와 패딩이 너비에 포함되도록 설정 */
+    padding: .5rem; /* 패딩 조정 */
+    margin-top: 0.5rem; /* 레이블과의 거리를 조정 */
+}
+
+/* 폼 요소들 스타일링 */
+.form-group {
+    display: flex; /* Flexbox를 사용하여 요소들을 나란히 정렬 */
+    align-items: center; /* 세로 축에서 중앙 정렬 */
+    justify-content: space-between; /* 요소 사이에 공간을 균등하게 분배 */
+    margin-bottom: 1rem; /* 여백 조정 */
+}
+
+
+.form-label {
+    font-size: 1.25rem; /* 레이블 폰트 크기를 20px로 증가 */
+    font-weight: bold; /* 레이블 폰트 두께를 굵게 */
+    margin-right: 1rem;
+    margin-bottom: 0; /* 여백 조정 */
+    display: block; /* 블록 레벨 요소로 설정 */
+    text-align: center; /* 텍스트 중앙 정렬 */
+    flex-shrink: 0;
+}
+
+/* 이미지 업로드 입력 필드 스타일 */
+.upload-input {
+    font-size: 0.75rem; /* 폰트 크기를 작게 조정 */
+    padding: 4px; /* 패딩을 줄여 더 작게 보이게 함 */
+    width: 100%; /* 너비는 유지 */
+}
+
+/* 제목 입력 필드 스타일 */
+.title-input {
+    font-size: 1.5rem !important; /* 폰트 크기를 1.5rem으로 증가시키고, 다른 스타일보다 우선시함 */
+    padding: 16px !important; /* 패딩을 12px로 설정하고, 다른 스타일보다 우선시함 */
+    width: 100% !important; /* 너비를 100%로 설정하고, 다른 스타일보다 우선시함 */
+    height: auto !important; /* 높이를 자동으로 조정하고, 다른 스타일보다 우선시함 */
+}
+
+/* 입력 필드 스타일링 */
+.form-control {
+    /* 필요하다면 flex-grow 속성을 제거하거나 주석 처리합니다. 
+    flex-grow: 1; */
+    width: 100%; /* 너비를 100%로 설정하여 부모 요소의 전체 너비를 차지하도록 합니다. */
+    max-width: 600px; /* 최대 너비를 600px로 설정합니다. */
+    padding: .75rem 1rem; /* 상하좌우 패딩을 유지합니다. */
+    font-size: 1rem; /* 폰트 크기를 조절합니다. */
+    line-height: 1.5;
+    color: #495057; /* 글자 색상을 정합니다. */
+    background-color: #fff; /* 배경색을 설정합니다. */
+    border: 1px solid #ced4da; /* 테두리 스타일을 정의합니다. */
+    border-radius: .25rem; /* 모서리를 둥글게 만듭니다. */
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out; /* 부드러운 전환 효과를 추가합니다. */
+}
+/* 버튼 스타일링 */
+.submit-button {
+    width: auto; /* 버튼 너비 자동 */
+    display: inline-block;
+    padding: .5rem 1rem;
+    font-size: 1rem; /* 통일된 텍스트 크기 */
+    line-height: 1.5;
+    text-align: center;
+    color: #fff;
+    background-color: #007bff; /* 버튼 배경색 */
+    border: none;
+    border-radius: .25rem;
+    cursor: pointer;
+}
+
+.submit-button:hover {
+    background-color: #0056b3; /* 버튼 호버 효과 */
+}
+
+.input-image {
+	flex-grow: 1;
+    font-size: 1rem; /* 입력 필드의 폰트 크기를 표준 크기로 설정 */
+    padding: .75rem 1rem; /* 입력 필드의 내부 패딩을 조정하여 크기 증가 */
+}
+
+/* input[type="file"]을 아름답게 만들기 위한 커스텀 스타일링 */
+.input-image::file-selector-button {
+    background-color: #007bff;
+    color: white;
+    padding: .5rem 1rem;
+    border: none;
+    border-radius: .25rem;
+    margin-right: .5rem;
+    cursor: pointer;
+}
+
+.input-image::file-selector-button:hover {
+    background-color: #0056b3;
+}
