@@ -31,10 +31,6 @@ export default function Navbar() {
       }`}
     >
       <nav className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-        <a href="#" className="font-mono text-black/50 dark:text-white/40 font-medium text-xs tracking-[0.2em] hover:text-black dark:hover:text-white transition-colors">
-          &lt;JJB /&gt;
-        </a>
-
         <ul className="hidden md:flex items-center gap-1">
           {links.map((link) => (
             <li key={link.href}>

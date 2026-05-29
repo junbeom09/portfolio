@@ -160,9 +160,7 @@ export default function ComponentDemo() {
         </div>
       </div>
 
-      <p className="text-xs text-center" style={{ color: isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.25)' }}>
-        다크 모드 토글을 눌러 전체 사이트를 바꿔보세요
-      </p>
+    
     </motion.div>
   )
 }

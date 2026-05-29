@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>뉴진스 NEWjinS · UI 데모</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Pretendard', 'system-ui', 'sans-serif'] },
+          colors: { brand: { DEFAULT: '#1f6feb', dark: '#1a5fd0' } },
+        },
+      },
+    }
+  </script>
+  <style>
+    body { font-family: 'Pretendard', system-ui, sans-serif; letter-spacing: -0.02em; }
+    [hidden] { display: none !important; }
+    .clamp2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    ::-webkit-scrollbar { width: 9px; height: 9px; }
+    ::-webkit-scrollbar-thumb { background: #d2d6dc; border-radius: 9px; }
+  </style>
+</head>
+<body class="bg-[#f2f3f5] text-[#1a1a1e]">
+
+  <!-- 데모 안내 -->
+  <div class="fixed bottom-4 right-4 z-50 bg-slate-900/90 text-white text-xs px-3 py-2 rounded-lg shadow-lg backdrop-blur">
+    UI/UX 데모 · 실제 데이터·기능은 동작하지 않습니다
+  </div>
+
+  <!-- ================= 헤더 ================= -->
+  <header class="bg-white border-b border-slate-200">
+    <div class="max-w-[1100px] mx-auto px-5 pt-6 pb-4 flex items-center gap-8">
+      <!-- 로고 -->
+      <a href="#" onclick="goHome();return false" class="flex items-center gap-2 shrink-0">
+        <span class="w-9 h-9 rounded-xl bg-brand flex items-center justify-center text-white font-extrabold text-lg">N</span>
+        <span class="text-2xl font-extrabold tracking-tight">NEW<span class="text-brand">jinS</span></span>
+      </a>
+
+      <!-- 검색 -->
+      <div class="flex-1 max-w-xl">
+        <div class="flex">
+          <input id="search" oninput="renderNews()" type="text" placeholder="검색어를 입력해주세요" autocomplete="off"
+            class="flex-1 h-11 border border-brand/70 border-r-0 rounded-l-lg px-4 text-sm focus:outline-none focus:border-brand" />
+          <button onclick="renderNews()" class="w-12 h-11 bg-brand hover:bg-brand-dark rounded-r-lg flex items-center justify-center transition-colors" aria-label="검색">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </button>
+        </div>
+        <p class="text-xs text-brand mt-2 pl-1">기사 제목을 클릭하면 원문 링크로 이동됩니다.</p>
+      </div>
+
+      <!-- 로그인 -->
+      <div class="flex items-center gap-1.5 shrink-0 text-sm">
+        <button class="px-3 py-2 text-slate-500 hover:text-slate-900 font-medium rounded-md hover:bg-slate-100 transition-colors">로그인</button>
+        <span class="text-slate-200">|</span>
+        <button class="px-3 py-2 text-slate-500 hover:text-slate-900 font-medium rounded-md hover:bg-slate-100 transition-colors">회원가입</button>
+      </div>
+    </div>
+
+    <!-- GNB -->
+    <nav class="border-t border-slate-100">
+      <div class="max-w-[1100px] mx-auto px-5 flex items-center gap-1 h-[52px] overflow-x-auto">
+        <button onclick="selectCat(this,'전체')" class="cat-btn px-3 h-full text-[15px] font-bold whitespace-nowrap text-brand border-b-2 border-brand">홈</button>
+        <button onclick="selectCat(this,'구독')" class="cat-btn px-3 h-full text-[15px] font-bold whitespace-nowrap text-slate-700 border-b-2 border-transparent hover:text-slate-900">구독</button>
+        <span class="w-px h-4 bg-slate-200 mx-1.5"></span>
+        <button onclick="selectCat(this,'사회')" class="cat-btn px-3 h-full text-[15px] font-bold whitespace-nowrap text-slate-700 border-b-2 border-transparent hover:text-slate-900">사회</button>
+        <button onclick="selectCat(this,'정치')" class="cat-btn px-3 h-full text-[15px] font-bold whitespace-nowrap text-slate-700 border-b-2 border-transparent hover:text-slate-900">정치</button>
+        <button onclick="selectCat(this,'경제')" class="cat-btn px-3 h-full text-[15px] font-bold whitespace-nowrap text-slate-700 border-b-2 border-transparent hover:text-slate-900">경제</button>
+        <button onclick="selectCat(this,'국제')" class="cat-btn px-3 h-full text-[15px] font-bold whitespace-nowrap text-slate-700 border-b-2 border-transparent hover:text-slate-900">국제</button>
+        <button onclick="selectCat(this,'문화')" class="cat-btn px-3 h-full text-[15px] font-bold whitespace-nowrap text-slate-700 border-b-2 border-transparent hover:text-slate-900">문화</button>
+        <button onclick="selectCat(this,'IT')" class="cat-btn px-3 h-full text-[15px] font-bold whitespace-nowrap text-slate-700 border-b-2 border-transparent hover:text-slate-900">IT</button>
+        <span class="w-px h-4 bg-slate-200 mx-1.5"></span>
+        <span class="text-[13px] text-slate-400 whitespace-nowrap px-2">연합뉴스</span>
+        <span class="text-[13px] text-slate-400 whitespace-nowrap px-2">한국경제</span>
+        <span class="text-[13px] text-slate-400 whitespace-nowrap px-2">머니투데이</span>
+        <span class="text-[13px] text-slate-400 whitespace-nowrap px-2">동아일보</span>
+      </div>
+    </nav>
+  </header>
+
+  <!-- ================= 본문 ================= -->
+  <main class="max-w-[1100px] mx-auto px-5 py-6 flex gap-4 items-start">
+
+    <!-- 좌측 콘텐츠 -->
+    <div class="flex-1 min-w-0 flex flex-col gap-4">
+
+      <!-- 오늘의 이슈 -->
+      <section class="bg-white rounded-xl border border-slate-200/70 p-6">
+        <div class="flex items-center justify-between mb-1">
+          <h2 class="text-lg font-bold">오늘의 이슈</h2>
+          <span id="catLabel" class="text-xs text-slate-400">전체</span>
+        </div>
+        <p class="text-xs text-slate-400 mb-2 flex items-center gap-1.5">
+          <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-violet-50 text-violet-600 font-semibold">✦ AI 요약</span>
+          머신러닝(KoBART)이 본문을 요약하고, 가짜뉴스 의심 기사를 표시합니다.
+        </p>
+        <ul id="newsList" class="divide-y divide-slate-100"></ul>
+        <div id="moreWrap" class="flex justify-center pt-5">
+          <button onclick="loadMore()" class="px-5 py-2.5 text-sm font-semibold text-brand border border-brand/30 rounded-lg hover:bg-brand/5 transition-colors">기사 더보기</button>
+        </div>
+      </section>
+
+      <!-- 추천 뉴스 -->
+      <section class="bg-white rounded-xl border border-slate-200/70 p-6">
+        <h2 class="text-lg font-bold mb-4">추천 뉴스</h2>
+        <div id="recommend" class="grid grid-cols-2 gap-x-6 gap-y-5"></div>
+      </section>
+    </div>
+
+    <!-- 우측 사이드 -->
+    <aside class="w-[330px] shrink-0 flex flex-col gap-4">
+
+      <!-- 코스피/코스닥 -->
+      <section class="bg-white rounded-xl border border-slate-200/70 p-5">
+        <div class="grid grid-cols-2 divide-x divide-slate-100">
+          <div class="pr-4">
+            <p class="text-sm font-semibold">코스닥</p>
+            <p class="text-xl font-extrabold text-blue-600 mt-1.5">856.25</p>
+            <p class="text-xs text-blue-600 mt-0.5">▼ 4.17 (-0.48%)</p>
+          </div>
+          <div class="pl-4">
+            <p class="text-sm font-semibold">코스피</p>
+            <p class="text-xl font-extrabold text-red-500 mt-1.5">2,859.97</p>
+            <p class="text-xs text-red-500 mt-0.5">▲ 7.41 (+0.26%)</p>
+          </div>
+        </div>
+        <p class="text-[11px] text-slate-400 mt-3">기준시간 10:32 장중</p>
+      </section>
+
+      <!-- 카카오 채널 -->
+      <section class="bg-white rounded-xl border border-slate-200/70 p-5 text-center">
+        <h3 class="text-[15px] font-bold leading-snug mb-3">카카오톡 채널을 추가해<br />다양한 뉴스를 만나보세요</h3>
+        <div class="rounded-lg bg-[#fee500] text-[#3c1e1e] font-bold py-3 flex items-center justify-center gap-2 cursor-pointer hover:brightness-95 transition">
+          <span class="text-lg">💬</span> 채널 추가하기
+        </div>
+        <p class="text-xs text-slate-400 mt-3">챗봇으로 맞춤 뉴스레터를 받아보세요.</p>
+      </section>
+
+      <!-- 구독 언론사 -->
+      <section class="bg-white rounded-xl border border-slate-200/70 p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-[15px] font-bold">언론사 구독</h3>
+          <span class="text-xs text-slate-400">56곳</span>
+        </div>
+        <div id="press" class="grid grid-cols-4 gap-y-4 gap-x-2"></div>
+      </section>
+
+      <!-- 광고 -->
+      <section class="rounded-xl border border-dashed border-slate-300 bg-slate-50 h-[200px] flex items-center justify-center text-sm text-slate-400">
+        광고 영역
+      </section>
+    </aside>
+  </main>
+
+  <footer class="border-t border-slate-200 bg-white">
+    <div class="max-w-[1100px] mx-auto px-5 py-6 text-xs text-slate-400 flex items-center justify-between">
+      <span class="font-bold text-slate-500">NEWjinS</span>
+      <span>뉴스 크롤링 · DBSCAN 군집화 · 가짜뉴스 판별 · 본문 요약 · 2024</span>
+    </div>
+  </footer>
+
+  <script>
+    // ---------- 데이터 ----------
+    const press = ['연합뉴스', '한국경제', '머니투데이', '동아일보', '조선비즈', '중앙일보', '경향신문', '국민일보', '세계일보', '한국일보', '전자신문', '노컷뉴스']
+    const pressColors = ['#1f6feb', '#e8590c', '#2f9e44', '#9c36b5', '#1098ad', '#e03131', '#495057', '#f08c00', '#0c8599', '#5f3dc4', '#c2255c', '#2b8a3e']
+
+    const articles = [
+      { cat: '경제', pub: '한국경제', title: '반도체 수출 5개월 연속 증가…하반기 회복세 뚜렷', summary: '반도체 수출이 전년 대비 큰 폭으로 늘며 5개월 연속 상승했다. 업계는 하반기 메모리 단가 회복을 주요 요인으로 분석했다.', trust: 'ok' },
+      { cat: '사회', pub: '연합뉴스', title: '전국 장마전선 북상…수도권 시간당 50mm 폭우 예보', summary: '기상청은 장마전선의 영향으로 수도권과 충청권에 강한 비가 내리겠다고 예보했다. 침수 피해 대비가 필요하다.', trust: 'ok' },
+      { cat: 'IT', pub: '전자신문', title: '국내 스타트업, 한국어 요약 AI 모델 오픈소스 공개', summary: 'KoBART 기반의 경량 요약 모델이 공개됐다. 뉴스·문서 요약에 특화돼 온디바이스 환경에서도 동작한다.', trust: 'ok' },
+      { cat: '정치', pub: '중앙일보', title: '"내일 당장 3억 지급"…출처 불명 정책 게시물 확산', summary: '근거 없는 현금 지급 주장이 SNS에서 빠르게 퍼지고 있다. 사실 확인 결과 공식 발표된 바 없는 내용으로 나타났다.', trust: 'fake' },
+      { cat: '경제', pub: '머니투데이', title: '원/달러 환율 1,380원대…외환당국 구두개입 시사', summary: '환율 변동성이 커지자 외환당국이 시장 안정 조치 가능성을 언급했다. 전문가들은 단기 등락이 이어질 것으로 봤다.', trust: 'ok' },
+      { cat: '문화', pub: '동아일보', title: '여름 성수기 극장가, 국산 애니메이션 흥행 돌풍', summary: '개봉 2주 만에 누적 관객 300만을 돌파했다. 가족 단위 관객 비중이 높았던 점이 흥행을 이끌었다.', trust: 'ok' },
+      { cat: '국제', pub: '세계일보', title: '주요국 중앙은행, 금리 동결 기조…인하 시점 신중', summary: '인플레이션 둔화가 확인되기 전까지 금리를 유지하겠다는 입장이 이어졌다. 시장은 연내 인하 가능성을 주시하고 있다.', trust: 'ok' },
+      { cat: '사회', pub: '국민일보', title: '"특정 식품 먹으면 코로나 완치" 영상 또 등장', summary: '의학적 근거가 없는 치료 주장이 담긴 영상이 재유포되고 있다. 보건당국은 허위정보에 주의할 것을 당부했다.', trust: 'fake' },
+      { cat: 'IT', pub: '조선비즈', title: '클라우드 3사, 국내 AI 데이터센터 투자 확대', summary: '국내 AI 수요 증가에 맞춰 대규모 데이터센터 증설 계획이 잇따라 발표됐다. 전력 수급이 변수로 지목됐다.', trust: 'ok' },
+      { cat: '경제', pub: '경향신문', title: '소비자물가 2%대 안착…장바구니 체감은 여전', summary: '지표상 물가 상승률은 둔화됐지만 신선식품 가격은 높은 수준을 유지했다. 체감 물가와의 괴리가 지적됐다.', trust: 'ok' },
+      { cat: '정치', pub: '한국일보', title: '여야, 민생법안 처리 두고 막판 협상 이어가', summary: '쟁점 법안을 둘러싼 협상이 본회의를 앞두고 분주하게 진행됐다. 일부 조항에서는 이견이 좁혀지지 않았다.', trust: 'ok' },
+      { cat: '문화', pub: '노컷뉴스', title: '국립박물관 야간 개장 인기…예약 조기 마감', summary: '여름 한정 야간 개장 프로그램에 관람객이 몰리며 주말 예약이 빠르게 마감됐다. 추가 회차 편성이 검토된다.', trust: 'ok' },
+      { cat: '국제', pub: '연합뉴스', title: '"세계 인구 내년에 반으로 감소" 가짜 통계 유포', summary: '근거 없는 인구 통계가 짜깁기된 그래프와 함께 퍼지고 있다. 원 자료를 확인한 결과 사실이 아닌 것으로 드러났다.', trust: 'fake' },
+      { cat: 'IT', pub: '전자신문', title: '오픈소스 LLM, 한국어 벤치마크서 상용 모델 추격', summary: '공개 모델들이 한국어 이해 평가에서 상용 모델과의 격차를 빠르게 줄였다. 파인튜닝 생태계 확장이 배경으로 꼽혔다.', trust: 'ok' },
+    ]
+
+    // ---------- 언론사 칩 ----------
+    document.getElementById('press').innerHTML = press.map((name, i) => `
+      <div class="flex flex-col items-center gap-1.5 cursor-pointer group">
+        <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-white font-bold shadow-sm group-hover:scale-105 transition-transform" style="background:${pressColors[i]}">${name[0]}</div>
+        <span class="text-[11px] text-slate-500 text-center leading-tight w-full truncate">${name}</span>
+      </div>`).join('')
+
+    // ---------- 추천 뉴스 ----------
+    document.getElementById('recommend').innerHTML = articles.slice(0, 4).map((a) => `
+      <a href="#" onclick="return false" class="group flex gap-3">
+        <div class="flex-1 min-w-0">
+          <p class="text-xs text-brand mb-1">${a.pub}</p>
+          <p class="text-sm font-medium leading-snug clamp2 group-hover:underline">${a.title}</p>
+        </div>
+        <div class="w-20 h-14 rounded-lg shrink-0" style="background:linear-gradient(135deg,#e7ecf3,#d7deea)"></div>
+      </a>`).join('')
+
+    // ---------- 오늘의 이슈 ----------
+    let cat = '전체'
+    let visible = 6
+
+    function trustBadge(t) {
+      return t === 'fake'
+        ? '<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-red-50 text-red-600 text-[11px] font-semibold">⚠ 가짜뉴스 의심</span>'
+        : '<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-600 text-[11px] font-semibold">✓ 신뢰</span>'
+    }
+
+    function filtered() {
+      const q = document.getElementById('search').value.trim()
+      return articles.filter((a) => {
+        if (cat !== '전체' && cat !== '구독' && a.cat !== cat) return false
+        if (q && !a.title.includes(q) && !a.summary.includes(q)) return false
+        return true
+      })
+    }
+
+    function renderNews() {
+      const rows = filtered()
+      const shown = rows.slice(0, visible)
+      document.getElementById('newsList').innerHTML = shown.length
+        ? shown.map((a) => `
+          <li class="py-4 first:pt-2 flex gap-4">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1.5">
+                <span class="text-xs font-semibold text-brand">${a.pub}</span>
+                <span class="text-xs text-slate-300">·</span>
+                <span class="text-xs text-slate-400">${a.cat}</span>
+                ${trustBadge(a.trust)}
+              </div>
+              <a href="#" onclick="return false" class="block font-semibold text-[17px] leading-snug hover:underline">${a.title}</a>
+              <p class="text-[13px] text-slate-500 mt-1.5 leading-relaxed clamp2">
+                <span class="text-violet-500 font-semibold">✦ AI 요약 </span>${a.summary}
+              </p>
+            </div>
+            <div class="w-28 h-[72px] rounded-lg shrink-0" style="background:linear-gradient(135deg,#e7ecf3,#d7deea)"></div>
+          </li>`).join('')
+        : '<li class="py-12 text-center text-sm text-slate-400">검색 결과가 없습니다.</li>'
+      document.getElementById('moreWrap').hidden = visible >= rows.length || rows.length === 0
+      document.getElementById('catLabel').textContent = cat
+    }
+
+    function loadMore() { visible += 4; renderNews() }
+
+    function selectCat(btn, name) {
+      cat = name
+      visible = 6
+      document.querySelectorAll('.cat-btn').forEach((b) => {
+        b.classList.remove('text-brand', 'border-brand')
+        b.classList.add('text-slate-700', 'border-transparent')
+      })
+      btn.classList.add('text-brand', 'border-brand')
+      btn.classList.remove('text-slate-700', 'border-transparent')
+      renderNews()
+    }
+    function goHome() {
+      document.getElementById('search').value = ''
+      const homeBtn = document.querySelector('.cat-btn')
+      selectCat(homeBtn, '전체')
+      window.scrollTo(0, 0)
+    }
+
+    renderNews()
+  </script>
+</body>
+</html>

@@ -1,21 +1,19 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Monitor, Tablet, Smartphone } from 'lucide-react'
+import { Monitor, Smartphone } from 'lucide-react'
 
 const devices = [
-  { name: 'Mobile',   icon: Smartphone, w: 375,  h: 220, label: '375px' },
-  { name: 'Tablet',   icon: Tablet,     w: 768,  h: 260, label: '768px' },
-  { name: 'Desktop',  icon: Monitor,    w: '100%', h: 300, label: '100%' },
+  { name: 'Mobile',   icon: Smartphone, w: 320,    label: '320px' },
+  { name: 'Desktop',  icon: Monitor,    w: '100%', label: '100%' },
 ]
 
 const popupSizes = {
-  Mobile:  { w: 390,  h: 844  },
-  Tablet:  { w: 820,  h: 1180 },
+  Mobile:  { w: 390,  h: 740  },
 }
 
 function MockPage({ isDesktop, isMobile }) {
   return (
-    <div className="w-full h-full bg-[#f9f9f7] overflow-hidden flex flex-col" style={{ fontSize: isMobile ? '5px' : '6px' }}>
+    <div className="w-full bg-[#f9f9f7] overflow-hidden flex flex-col" style={{ fontSize: isMobile ? '5px' : '6px' }}>
       <div className="flex items-center justify-between px-3 py-2 bg-white border-b border-black/5 flex-shrink-0">
         <div className="font-bold text-black font-mono" style={{ fontSize: '7px' }}>&lt;JJB/&gt;</div>
         {!isMobile ? (
@@ -54,19 +52,17 @@ function MockPage({ isDesktop, isMobile }) {
         )}
       </div>
 
-      {!isMobile && (
-        <div className={`grid ${isDesktop ? 'grid-cols-4' : 'grid-cols-2'} gap-1.5 px-3 mb-2`}>
-          {['Projects', 'Commits', 'Skills', 'Teams'].slice(0, isDesktop ? 4 : 2).map((s) => (
-            <div key={s} className="bg-white border border-black/6 rounded p-1.5">
-              <div className="text-black/20 mb-0.5">{s}</div>
-              <div className="font-black text-black" style={{ fontSize: '8px' }}>12+</div>
-            </div>
-          ))}
-        </div>
-      )}
+      <div className={`grid ${isMobile ? 'grid-cols-2' : 'grid-cols-4'} gap-1.5 px-3 mb-2`}>
+        {['Projects', 'Commits', 'Skills', 'Teams'].map((s) => (
+          <div key={s} className="bg-white border border-black/6 rounded p-1.5">
+            <div className="text-black/20 mb-0.5">{s}</div>
+            <div className="font-black text-black" style={{ fontSize: '8px' }}>12+</div>
+          </div>
+        ))}
+      </div>
 
       <div className={`grid ${isDesktop ? 'grid-cols-2' : 'grid-cols-1'} gap-1.5 px-3 pb-3`}>
-        {(isDesktop ? ['Project 1', 'Project 2'] : ['Project 1']).map((s) => (
+        {['Project 1', 'Project 2', 'Project 3', 'Project 4'].map((s) => (
           <div key={s} className="bg-white rounded border border-black/6 p-1.5">
             <div className="flex items-center gap-1 mb-1">
               <div className="w-3 h-3 rounded bg-black/8" />
@@ -87,6 +83,26 @@ function MockPage({ isDesktop, isMobile }) {
 export default function ResponsiveDemo() {
   const [active, setActive] = useState('Desktop')
   const device = devices.find((d) => d.name === active)
+
+  // 컨테이너 실제 폭을 측정해 디바이스 너비를 px로 적용 (패널을 넘으면 클램프)
+  const containerRef = useRef(null)
+  const [containerW, setContainerW] = useState(0)
+
+  useEffect(() => {
+    const el = containerRef.current
+    if (!el) return
+    const update = () => setContainerW(el.offsetWidth)
+    update()
+    const ro = new ResizeObserver(update)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
+  const targetW = containerW
+    ? device.w === '100%'
+      ? containerW
+      : Math.min(device.w, containerW)
+    : '100%'
 
   function openPopup() {
     const size = popupSizes[active]
@@ -129,11 +145,11 @@ export default function ResponsiveDemo() {
       </div>
 
       {/* 브라우저 목업 */}
-      <div className="w-full overflow-hidden">
+      <div ref={containerRef} className="w-full overflow-hidden flex justify-center">
         <motion.div
-          animate={{ height: device.h }}
+          animate={{ width: targetW }}
           transition={{ type: 'spring', stiffness: 260, damping: 28 }}
-          className="w-full"
+          style={{ maxWidth: '100%' }}
         >
           <AnimatePresence mode="wait">
             <motion.div
@@ -142,7 +158,7 @@ export default function ResponsiveDemo() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.98 }}
               transition={{ duration: 0.2 }}
-              className="w-full h-full rounded-xl border border-black/10 dark:border-white/10 shadow-md overflow-hidden bg-white"
+              className="w-full rounded-xl border border-black/10 dark:border-white/10 shadow-md overflow-hidden bg-white"
             >
               {/* 브라우저 상단바 */}
               <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[#efefed] border-b border-black/6 flex-shrink-0">
@@ -153,12 +169,10 @@ export default function ResponsiveDemo() {
                   portfolio.dev
                 </div>
               </div>
-              <div className="overflow-y-auto" style={{ height: 'calc(100% - 28px)' }}>
-                <MockPage
-                  isDesktop={active === 'Desktop'}
-                  isMobile={active === 'Mobile'}
-                />
-              </div>
+              <MockPage
+                isDesktop={active === 'Desktop'}
+                isMobile={active === 'Mobile'}
+              />
             </motion.div>
           </AnimatePresence>
         </motion.div>
