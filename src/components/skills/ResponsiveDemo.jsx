@@ -137,7 +137,7 @@ export default function ResponsiveDemo() {
         {popupSizes[active] && (
           <button
             onClick={openPopup}
-            className="text-[10px] font-mono text-black/30 dark:text-white/25 hover:text-black/60 dark:hover:text-white/60 transition-colors border border-black/8 dark:border-white/8 px-2 py-1 rounded-lg"
+            className="text-xs font-medium text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white transition-colors border border-black/25 dark:border-white/25 hover:border-black/45 dark:hover:border-white/45 px-3 py-1.5 rounded-lg"
           >
             실제 크기로 열기 ↗
           </button>

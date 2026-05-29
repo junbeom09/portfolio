@@ -3,339 +3,604 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>헬프티처 관리자 · UI 데모</title>
+  <title>마인드룸 어드민 · UI 데모</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: { extend: { maxWidth: { 300: '75rem' } } },
-    }
-  </script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <style>
     [hidden] { display: none !important; }
-    /* ===== 반응형 보정: 좁은 화면에서만 가로 스크롤 허용 (데스크톱 무변경) ===== */
+    body { font-family: 'Pretendard', system-ui, -apple-system, sans-serif; }
     @media (max-width: 1000px) {
       #app > header { overflow-x: auto; }
-      #view-orglist .bg-white { overflow-x: auto; }
-      #view-orglist table, #view-boothlist table { min-width: 760px; }
-      #view-boothlist .max-w-300 { overflow-x: auto; }
+      .tbl-wrap { overflow-x: auto; }
+      .tbl-wrap table { min-width: 820px; }
     }
   </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800">
+
   <div class="fixed bottom-4 right-4 z-[9999] bg-slate-900/90 text-white text-xs px-3 py-2 rounded-lg shadow-lg">
     UI/UX 데모 · 실제 데이터·기능은 동작하지 않습니다
   </div>
 
-  <!-- ============ 로그인 ((auth)/login) ============ -->
+  <!-- ================= 로그인 ================= -->
   <section id="login" class="min-h-screen flex items-center justify-center bg-slate-100">
     <div class="w-full max-w-sm">
       <div class="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
         <div class="text-center mb-6">
-          <img src="helpteacherLogo.png" alt="logo image" class="h-32 mx-auto object-contain" />
+          <img src="helpteacherLogo.png" alt="logo" class="h-32 mx-auto object-contain" />
           <p class="text-base text-slate-500 mt-3">관리자 페이지에 로그인 하세요.</p>
         </div>
-        <form class="flex flex-col gap-5" onsubmit="enterApp(event)">
+        <form onsubmit="enterApp(event)" class="flex flex-col gap-5">
           <div>
-            <label for="id" class="block text-base font-medium text-slate-700 mb-2">아이디</label>
-            <input type="text" id="id" value="admin" placeholder="아이디 입력"
-              class="w-full border border-slate-200 rounded-md py-2.5 px-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <label class="block text-base font-medium text-slate-700 mb-2">아이디</label>
+            <input type="text" value="admin" class="w-full border border-slate-200 rounded-md py-2.5 px-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500" />
           </div>
           <div>
-            <label for="password" class="block text-base font-medium text-slate-700 mb-2">비밀번호</label>
-            <input type="password" id="password" value="000000" placeholder="비밀번호 입력"
-              class="w-full border border-slate-200 rounded-md py-2.5 px-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <label class="block text-base font-medium text-slate-700 mb-2">비밀번호</label>
+            <div class="relative">
+              <input id="pw" type="password" value="000000" class="w-full border border-slate-200 rounded-md py-2.5 px-3 pr-10 text-base focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <button type="button" onclick="togglePw()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-sm">👁</button>
+            </div>
           </div>
-          <button type="submit"
-            class="w-full py-2.5 px-4 text-base font-medium bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors mt-1">login</button>
+          <button type="submit" class="w-full py-2.5 px-4 text-base font-medium bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors mt-1">로그인</button>
         </form>
       </div>
+      <p class="text-center text-xs text-slate-400 mt-4">데모 계정이 입력되어 있어요. 그대로 로그인하세요.</p>
     </div>
   </section>
 
-  <!-- ============ 관리자 ((admin)/layout) ============ -->
-  <div id="app" hidden class="min-h-screen flex flex-col bg-slate-50">
+  <!-- ================= 앱 ================= -->
+  <div id="app" hidden class="min-h-screen flex flex-col">
 
-    <header class="h-14 bg-white border-b border-slate-200 flex items-center px-6 shdow-sm">
-      <div class="h-9 mr-8">
-        <a href="#" onclick="showView('dashboard');return false">
-          <img src="helpteacherLogo.png" alt="로고 이미지" class="block object-contain h-full" />
-        </a>
-      </div>
-
-      <div class="flex gap-x-1 mr-auto">
-        <a href="#" onclick="showView('dashboard');return false">
-          <button class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover: bg-slate-100 rounded-md transition-colors">대시보드</button>
-        </a>
-
-        <!-- 기관 관리 -->
+    <!-- 헤더 -->
+    <header class="h-14 bg-white border-b border-slate-200 flex items-center px-6 sticky top-0 z-30">
+      <button onclick="showView('dashboard')" class="h-9 mr-8 flex items-center">
+        <img src="helpteacherLogo.png" alt="로고" class="block object-contain h-full" />
+      </button>
+      <nav class="flex gap-x-1 mr-auto items-center">
+        <button data-navgroup="dashboard" onclick="showView('dashboard')" class="navbtn px-4 py-2 text-sm font-medium rounded-md transition-colors">대시보드</button>
         <div class="relative dd">
-          <button onclick="toggleDd('org')" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors flex items-center gap-1">
-            기관 관리 <span class="text-xs text-slate-400" data-arrow="org">▼</span>
-          </button>
-          <div data-menu="org" hidden class="absolute top-full left-0 mt-1 bg-white border border-slate-200 rouded-md shadow-lg min-w-max z-50">
-            <a href="#" onclick="showView('dashboard');return false" class="block px-4 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors first:rounded-t-md last:rounded-b-md">기관 코드 발급</a>
-            <a href="#" onclick="showView('orglist');return false" class="block px-4 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors first:rounded-t-md last:rounded-b-md">기관 목록</a>
+          <button onclick="toggleDd('org')" data-navgroup="org" class="navbtn px-4 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-1">기관 관리 <span class="text-xs text-slate-400" data-arrow="org">▼</span></button>
+          <div data-menu="org" hidden class="absolute top-full left-0 mt-1 bg-white border border-slate-200 rounded-md shadow-lg min-w-max z-50">
+            <button onclick="showView('placeholder')" class="block w-full text-left px-4 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 first:rounded-t-md">기관 코드 발급</button>
+            <button onclick="showView('org')" class="block w-full text-left px-4 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 last:rounded-b-md">기관 목록</button>
           </div>
         </div>
-
-        <!-- 부스 관리 -->
         <div class="relative dd">
-          <button onclick="toggleDd('booth')" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors flex items-center gap-1">
-            부스 관리 <span class="text-xs text-slate-400" data-arrow="booth">▼</span>
-          </button>
-          <div data-menu="booth" hidden class="absolute top-full left-0 mt-1 bg-white border border-slate-200 rouded-md shadow-lg min-w-max z-50">
-            <a href="#" onclick="showView('dashboard');return false" class="block px-4 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors first:rounded-t-md last:rounded-b-md">부스 코드 발급</a>
-            <a href="#" onclick="showView('boothlist');return false" class="block px-4 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors first:rounded-t-md last:rounded-b-md">부스 목록</a>
+          <button onclick="toggleDd('booth')" data-navgroup="booth" class="navbtn px-4 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-1">부스 관리 <span class="text-xs text-slate-400" data-arrow="booth">▼</span></button>
+          <div data-menu="booth" hidden class="absolute top-full left-0 mt-1 bg-white border border-slate-200 rounded-md shadow-lg min-w-max z-50">
+            <button onclick="showView('placeholder')" class="block w-full text-left px-4 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 first:rounded-t-md">부스 코드 발급</button>
+            <button onclick="showView('booth')" class="block w-full text-left px-4 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 last:rounded-b-md">부스 목록</button>
           </div>
         </div>
-
-        <!-- 장비 관리 -->
         <div class="relative dd">
-          <button onclick="toggleDd('devices')" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors flex items-center gap-1">
-            장비 관리 <span class="text-xs text-slate-400" data-arrow="devices">▼</span>
-          </button>
-          <div data-menu="devices" hidden class="absolute top-full left-0 mt-1 bg-white border border-slate-200 rouded-md shadow-lg min-w-max z-50">
-            <a href="#" onclick="showView('dashboard');return false" class="block px-4 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors first:rounded-t-md last:rounded-b-md">장비 등록</a>
-            <a href="#" onclick="showView('dashboard');return false" class="block px-4 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors first:rounded-t-md last:rounded-b-md">장비 목록</a>
+          <button onclick="toggleDd('device')" data-navgroup="device" class="navbtn px-4 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-1">장비 관리 <span class="text-xs text-slate-400" data-arrow="device">▼</span></button>
+          <div data-menu="device" hidden class="absolute top-full left-0 mt-1 bg-white border border-slate-200 rounded-md shadow-lg min-w-max z-50">
+            <button onclick="showView('placeholder')" class="block w-full text-left px-4 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 first:rounded-t-md">장비 등록</button>
+            <button onclick="showView('minipc')" class="block w-full text-left px-4 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50">미니PC 목록</button>
+            <button onclick="showView('lte')" class="block w-full text-left px-4 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 last:rounded-b-md">LTE 라우터 목록</button>
           </div>
         </div>
-
-        <!-- 상담 관리 -->
         <div class="relative dd">
-          <button onclick="toggleDd('analytics')" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors flex items-center gap-1">
-            상담 관리 <span class="text-xs text-slate-400" data-arrow="analytics">▼</span>
-          </button>
-          <div data-menu="analytics" hidden class="absolute top-full left-0 mt-1 bg-white border border-slate-200 rouded-md shadow-lg min-w-max z-50">
-            <a href="#" onclick="showView('dashboard');return false" class="block px-4 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors first:rounded-t-md last:rounded-b-md">통계 정보 조회</a>
+          <button onclick="toggleDd('analytics')" data-navgroup="analytics" class="navbtn px-4 py-2 text-sm font-medium rounded-md transition-colors flex items-center gap-1">상담 관리 <span class="text-xs text-slate-400" data-arrow="analytics">▼</span></button>
+          <div data-menu="analytics" hidden class="absolute top-full left-0 mt-1 bg-white border border-slate-200 rounded-md shadow-lg min-w-max z-50">
+            <button onclick="showView('sessions')" class="block w-full text-left px-4 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 first:rounded-t-md">세션 목록</button>
+            <button onclick="showView('statistics')" class="block w-full text-left px-4 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 last:rounded-b-md">상담 통계</button>
           </div>
         </div>
-      </div>
-
-      <div class="ml-auto pr-10">
-        <a href="#" onclick="logout();return false">
-          <button class="px-4 py-2 rext-sm font-medium text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors">로그아웃</button>
-        </a>
-      </div>
+      </nav>
+      <button onclick="logout()" class="px-4 py-2 text-sm font-medium text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors">로그아웃</button>
     </header>
 
     <main class="flex-1">
-      <!-- 대시보드 ((admin)/test) -->
+
+      <!-- ===== 대시보드 ===== -->
       <section id="view-dashboard" class="p-8">
         <div class="mb-6">
-          <h1 class="text-xl font-semibold text-slate-800">대시보드</h1>
-          <p class="text-sm text-slate-500 mt-1">관리자 페이지 대시보드입니다.</p>
+          <h1 class="text-2xl font-semibold text-slate-800">대시보드</h1>
+          <p class="text-base text-slate-500 mt-1">전체 운영 현황을 확인합니다.</p>
         </div>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8" id="dashCards"></div>
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6" id="dashPanels"></div>
       </section>
 
-      <!-- 기관 목록 ((admin)/(org)/orglist) -->
-      <section id="view-orglist" hidden class="p-8">
-        <div class="mb-6">
-          <h1 class="text-2xl font-semibold text-slate-800">기관 목록</h1>
-          <p class="text-base text-slate-500 mt-1">등록된 기관을 조회합니다.</p>
-        </div>
-        <div class="bg-white rounded-lg border border-slate-200 shdow-sm">
-          <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100">
-            <div class="flex items-center gap-2 flex-wrap">
-              <input type="text" id="oSearch" oninput="renderOrg()" placeholder="기관명 또는 코드 검색"
-                class="border border-slate-200 rounded-md px-3 py-2 text-base bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-56" />
-              <select id="oRegion" onchange="oPage=1;renderOrg()" class="border border-slate-200 rounded-md px-3 py-2 text-base bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
-              <select id="oAccount" onchange="oPage=1;renderOrg()" class="border border-slate-200 rounded-md px-3 py-2 text-base bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="">계정 유무</option>
-                <option value="true">계정 있음</option>
-                <option value="false">계정 없음</option>
-              </select>
-              <button onclick="resetOrg()" class="text-base text-slate-400 hover:text-slate-600 underline underline-offset-2">초기화</button>
+      <!-- ===== 기관 목록 ===== -->
+      <section id="view-org" hidden class="p-8">
+        <div class="mb-6"><h1 class="text-2xl font-semibold text-slate-800">기관 목록</h1><p class="text-base text-slate-500 mt-1">등록된 기관을 조회합니다.</p></div>
+        <div class="bg-white rounded-lg border border-slate-200 shadow-sm">
+          <div class="flex items-center gap-3 px-5 py-4 border-b border-slate-100 flex-wrap">
+            <div class="flex items-center gap-2">
+              <input id="orgSearch" oninput="renderOrg()" type="text" placeholder="기관명 검색" class="border border-slate-200 rounded-md px-3 py-2 text-base bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 w-56" />
+              <button onclick="renderOrg()" class="px-4 py-2 text-base font-medium bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors">검색</button>
             </div>
-            <select id="oSize" onchange="oPage=1;renderOrg()" class="border border-slate-200 rounded-md px-3 py-2 text-base bg-white focus:outline-none">
-              <option value="10">10개씩</option>
-              <option value="20">20개씩</option>
-              <option value="50">50개씩</option>
-            </select>
+            <select id="orgRegion" onchange="renderOrg()" class="border border-slate-200 rounded-md px-3 py-2 text-base bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
+            <button onclick="document.getElementById('orgSearch').value='';document.getElementById('orgRegion').value='';renderOrg()" class="text-base text-slate-400 border-b border-dashed border-slate-400 hover:text-slate-600 hover:border-slate-600 transition-colors">초기화</button>
+            <div class="ml-auto"><select class="border border-slate-200 rounded-md px-3 py-2 text-base bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"><option>20개</option><option>10개</option><option>50개</option></select></div>
           </div>
-          <table class="w-full">
-            <thead>
-              <tr class="bg-slate-50 border-b border-slate-200">
+          <div class="tbl-wrap">
+            <table class="w-full">
+              <thead><tr class="bg-slate-50 border-b border-slate-200">
                 <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">기관 코드</th>
                 <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">기관명</th>
-                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500 cursor-pointer select-none hover:text-slate-700" onclick="oToggleSort()" id="oSortTh">둥록 일자 ▼</th>
-                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">운영 부스</th>
-                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">계정</th>
                 <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">지역</th>
-              </tr>
-            </thead>
-            <tbody id="oBody" class="divide-y divide-slate-100"></tbody>
-          </table>
-          <div class="flex items-center justify-between px-5 py-3 border-t bordere-slate-100">
-            <p id="oCount" class="text-sm text-slate-400"></p>
-            <div id="oPager" class="flex items-center gap-1"></div>
+                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">계약 시작일</th>
+                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">계약 종료일 ▼</th>
+                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">마지막 세션</th>
+              </tr></thead>
+              <tbody id="orgBody" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+          <div class="flex items-center justify-between px-5 py-3 border-t border-slate-100">
+            <p id="orgCount" class="text-sm text-slate-400"></p>
+            <div class="flex items-center gap-1 text-base text-slate-600">
+              <span class="px-2 py-1 opacity-30">&lt;&lt;</span><span class="px-2 py-1 opacity-30">&lt;</span>
+              <span class="px-3 py-1 rounded-md bg-blue-500 text-white font-medium">1</span>
+              <span class="px-2 py-1 opacity-30">&gt;</span><span class="px-2 py-1 opacity-30">&gt;&gt;</span>
+            </div>
           </div>
         </div>
       </section>
 
-      <!-- 부스 목록 ((admin)/(booth)/boothlist) -->
-      <section id="view-boothlist" hidden>
-        <div class="min-h-screen bg-stone-50">
-          <div class="max-w-300 mx-auto">
-            <div class="flex items-center justify-between mx-auto pt-10 pb-4">
-              <div class="flex items-center gap-2">
-                <input type="text" id="bSearch" oninput="renderBooth()" placeholder="검색어 입력" class="border rounded-sm py-1 px-2 mx-2 bg-white" />
-                <select id="bStatus" onchange="bPage=1;renderBooth()" class="border-2 rounded-sm py-1 px-2 mx-2 bg-white hover:bg-gray-100">
-                  <option value="">전체 상태</option>
-                  <option value="운영 중">운영 중</option>
-                  <option value="미운영">미운영</option>
-                  <option value="서비스 중단">서비스 중단</option>
-                </select>
-                <select id="bDevice" onchange="bPage=1;renderBooth()" class="border-2 rounded-sm py-1 px-2 mx-2 bg-white hover:bg-gray-100">
-                  <option value="">미할당 장비 선택</option>
-                  <option value="pc">미니 PC</option>
-                  <option value="monitor">모니터</option>
-                  <option value="lte">LTE 라우터</option>
-                </select>
-                <span onclick="resetBooth()" class="text-gray-500 border-gray-500 border-b border-dashed cursor-pointer">초기화</span>
-              </div>
-              <div class="flex items-center ml-auto bg-white hover:bg-gray-100">
-                <select id="bSize" onchange="bPage=1;renderBooth()" class="border-2 px-1 py-1">
-                  <option value="10">10개</option>
-                  <option value="20">20개</option>
-                  <option value="50">50개</option>
-                </select>
+      <!-- ===== 부스 목록 ===== -->
+      <section id="view-booth" hidden class="p-8">
+        <div class="mb-6"><h1 class="text-2xl font-semibold text-slate-800">부스 목록</h1><p class="text-base text-slate-500 mt-1">등록된 부스를 조회합니다.</p></div>
+        <div class="bg-white rounded-lg border border-slate-200 shadow-sm">
+          <div class="flex items-center gap-3 px-5 py-4 border-b border-slate-100 flex-wrap">
+            <div class="flex items-center gap-2">
+              <input id="boothSearch" oninput="renderBooth()" type="text" placeholder="기관 이름 검색" class="border border-slate-200 rounded-md px-3 py-2 text-base bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 w-56" />
+              <button onclick="renderBooth()" class="px-4 py-2 text-base font-medium bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors">검색</button>
+            </div>
+            <select id="boothStatus" onchange="renderBooth()" class="border border-slate-200 rounded-md px-3 py-2 text-base bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"><option value="">부스 상태 선택</option><option value="in_use">운영 중</option><option value="idle">미운영</option></select>
+            <select id="boothPc" onchange="renderBooth()" class="border border-slate-200 rounded-md px-3 py-2 text-base bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"><option value="">미니 PC 할당 여부</option><option value="true">할당</option><option value="false">미할당</option></select>
+            <button onclick="document.getElementById('boothSearch').value='';document.getElementById('boothStatus').value='';document.getElementById('boothPc').value='';renderBooth()" class="text-base text-slate-400 border-b border-dashed border-slate-400 hover:text-slate-600 hover:border-slate-600 transition-colors">초기화</button>
+          </div>
+          <div class="tbl-wrap">
+            <table class="w-full">
+              <thead><tr class="bg-slate-50 border-b border-slate-200">
+                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">부스 코드</th>
+                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">소속 기관명</th>
+                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">상담사</th>
+                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">지역</th>
+                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">미니 PC</th>
+                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">운영 상태</th>
+                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">마지막 세션</th>
+              </tr></thead>
+              <tbody id="boothBody" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+          <div class="px-5 py-3 border-t border-slate-100"><p id="boothCount" class="text-sm text-slate-400"></p></div>
+        </div>
+      </section>
+
+      <!-- ===== 미니PC 목록 ===== -->
+      <section id="view-minipc" hidden class="p-8">
+        <div class="mb-6"><h1 class="text-2xl font-semibold text-slate-800">미니PC 목록</h1><p class="text-base text-slate-500 mt-1">등록된 미니PC를 조회합니다.</p></div>
+        <div class="bg-white rounded-lg border border-slate-200 shadow-sm">
+          <div class="flex items-center gap-3 px-5 py-4 border-b border-slate-100">
+            <select id="pcStatus" onchange="renderPc()" class="border border-slate-200 rounded-md px-3 py-2 text-base bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"><option value="">장비 상태</option><option value="in_use">할당</option><option value="idle">미할당</option></select>
+            <button onclick="document.getElementById('pcStatus').value='';renderPc()" class="text-base text-slate-400 border-b border-dashed border-slate-400 hover:text-slate-600 hover:border-slate-600 transition-colors">필터 초기화</button>
+          </div>
+          <div class="tbl-wrap">
+            <table class="w-full">
+              <thead><tr class="bg-slate-50 border-b border-slate-200">
+                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">관리 번호</th>
+                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">모델명</th>
+                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">제조사</th>
+                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">BIOS 모델</th>
+                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">할당 부스</th>
+                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">상태</th>
+              </tr></thead>
+              <tbody id="pcBody" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+          <div class="px-5 py-3 border-t border-slate-100"><p id="pcCount" class="text-sm text-slate-400"></p></div>
+        </div>
+      </section>
+
+      <!-- ===== LTE 라우터 목록 ===== -->
+      <section id="view-lte" hidden class="p-8">
+        <div class="mb-6"><h1 class="text-2xl font-semibold text-slate-800">LTE 라우터 목록</h1><p class="text-base text-slate-500 mt-1">등록된 LTE 라우터를 조회합니다.</p></div>
+        <div class="bg-white rounded-lg border border-slate-200 shadow-sm">
+          <div class="flex items-center gap-3 px-5 py-4 border-b border-slate-100">
+            <select id="lteStatus" onchange="renderLte()" class="border border-slate-200 rounded-md px-3 py-2 text-base bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"><option value="">장비 상태</option><option value="in_use">할당</option><option value="idle">미할당</option></select>
+            <button onclick="document.getElementById('lteStatus').value='';renderLte()" class="text-base text-slate-400 border-b border-dashed border-slate-400 hover:text-slate-600 hover:border-slate-600 transition-colors">필터 초기화</button>
+          </div>
+          <div class="tbl-wrap">
+            <table class="w-full">
+              <thead><tr class="bg-slate-50 border-b border-slate-200">
+                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">라우터명</th>
+                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">모델</th>
+                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">시리얼 번호</th>
+                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">설치 위치</th>
+              </tr></thead>
+              <tbody id="lteBody" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+          <div class="px-5 py-3 border-t border-slate-100"><p id="lteCount" class="text-sm text-slate-400"></p></div>
+        </div>
+      </section>
+
+      <!-- ===== 세션 목록 ===== -->
+      <section id="view-sessions" hidden class="p-8">
+        <div class="mb-6"><h1 class="text-2xl font-semibold text-slate-800">세션 목록</h1><p class="text-base text-slate-500 mt-1">상담 세션 이력을 조회합니다.</p></div>
+        <div class="bg-white rounded-lg border border-slate-200 shadow-sm">
+          <div class="flex flex-wrap items-center gap-3 px-5 py-4 border-b border-slate-100">
+            <div class="flex items-center gap-2">
+              <input id="sesSearch" oninput="renderSes()" type="text" placeholder="기관 코드 검색" class="border border-slate-200 rounded-md px-3 py-2 text-base bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 w-44" />
+              <button onclick="renderSes()" class="px-4 py-2 text-base font-medium bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors">검색</button>
+            </div>
+            <select id="sesType" onchange="renderSes()" class="border border-slate-200 rounded-md px-3 py-2 text-base bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"><option value="">상담 유형 전체</option><option value="PSYCHOLOGICAL">심리</option><option value="CAREER">진로</option><option value="MBTI">MBTI</option></select>
+            <div class="flex items-center gap-2">
+              <input type="date" class="border border-slate-200 rounded-md px-3 py-2 text-base bg-white focus:outline-none focus:ring-2 focus:ring-blue-500" />
+              <span class="text-slate-400">~</span>
+              <input type="date" class="border border-slate-200 rounded-md px-3 py-2 text-base bg-white focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            </div>
+            <button onclick="document.getElementById('sesSearch').value='';document.getElementById('sesType').value='';renderSes()" class="text-base text-slate-400 border-b border-dashed border-slate-400 hover:text-slate-600 hover:border-slate-600 transition-colors">초기화</button>
+          </div>
+          <div class="tbl-wrap">
+            <table class="w-full">
+              <thead><tr class="bg-slate-50 border-b border-slate-200">
+                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">세션 일시</th>
+                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">기관명</th>
+                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">부스</th>
+                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">상담 유형</th>
+                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">성별 / 나이</th>
+                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">심리 점수</th>
+                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">고민 태그</th>
+                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">공개 여부</th>
+                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">지역</th>
+              </tr></thead>
+              <tbody id="sesBody" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+          <div class="px-5 py-3 border-t border-slate-100"><p id="sesCount" class="text-sm text-slate-400"></p></div>
+        </div>
+      </section>
+
+      <!-- ===== 상담 통계 ===== -->
+      <section id="view-statistics" hidden class="p-8">
+        <div class="mb-6 flex items-center justify-between flex-wrap gap-3">
+          <div><h1 class="text-2xl font-semibold text-slate-800">상담 통계</h1><p class="text-base text-slate-500 mt-1">상담 세션 전체 집계 현황</p></div>
+          <div class="flex items-center gap-2">
+            <select class="border border-slate-200 rounded-md px-3 py-2 text-base text-slate-600 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"><option>시/도</option></select>
+            <input type="date" class="border border-slate-200 rounded-md px-3 py-2 text-base text-slate-600 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <span class="text-slate-400">~</span>
+            <input type="date" class="border border-slate-200 rounded-md px-3 py-2 text-base text-slate-600 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500" />
+            <button class="px-4 py-2 text-base font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 transition-colors">조회</button>
+            <div class="w-px h-5 bg-slate-200 mx-1"></div>
+            <button class="px-4 py-2 text-base font-medium text-slate-600 bg-white border border-slate-200 rounded-md shadow-sm hover:bg-slate-50 transition-colors">CSV 내보내기</button>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-5">
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm px-6 py-5 border-l-[3px] border-l-blue-500"><p class="text-sm font-semibold uppercase tracking-wide text-slate-400 mb-2">총 세션 수</p><p class="text-3xl font-bold text-slate-800">3,284건</p></div>
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm px-6 py-5 border-l-[3px] border-l-blue-500"><p class="text-sm font-semibold uppercase tracking-wide text-slate-400 mb-2">고유 사용자 수</p><p class="text-3xl font-bold text-slate-800">2,103명</p></div>
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm px-6 py-5 border-l-[3px] border-l-blue-400"><p class="text-sm font-semibold uppercase tracking-wide text-slate-400 mb-2">평균 심리 점수</p><p class="text-3xl font-bold text-slate-800">62.4점</p></div>
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm px-6 py-5 border-l-[3px] border-l-blue-300"><p class="text-sm font-semibold uppercase tracking-wide text-slate-400 mb-2">데이터 공개율</p><p class="text-3xl font-bold text-slate-800">78.0%</p></div>
+          </div>
+
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm">
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between gap-4">
+              <div><h2 class="text-base font-semibold text-slate-700">세션 추이</h2><p class="text-sm text-slate-400 mt-0.5">최근 14일</p></div>
+              <div class="flex border border-slate-200 rounded-lg overflow-hidden text-xs font-medium">
+                <button onclick="setTrend('daily',this)" class="trend-btn px-3 py-1.5 bg-blue-500 text-white">일</button>
+                <button onclick="setTrend('weekly',this)" class="trend-btn px-3 py-1.5 text-slate-500 hover:bg-slate-50">주</button>
+                <button onclick="setTrend('monthly',this)" class="trend-btn px-3 py-1.5 text-slate-500 hover:bg-slate-50">월</button>
               </div>
             </div>
-            <div>
-              <table class="w-full mx-auto border-b">
-                <thead>
-                  <tr>
-                    <th class="text-left px-4 py-2 border-b">부스 코드</th>
-                    <th class="text-left px-4 py-2 border-b">소속 기관명</th>
-                    <th class="text-left px-4 py-2 border-b">부스 설치 위치</th>
-                    <th class="text-left px-4 py-2 border-b">장비 할당 여부</th>
-                    <th class="text-left px-4 py-2 border-b cursor-pointer" onclick="bToggleSort()" id="bSortTh">부스 설치 일자 ▼</th>
-                    <th class="text-left px-4 py-2 border-b">부스 상태</th>
-                  </tr>
+            <div class="px-5 py-5"><canvas id="chTrend" height="220"></canvas></div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-5 gap-5">
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm lg:col-span-2">
+              <div class="px-6 py-4 border-b border-slate-100"><h2 class="text-base font-semibold text-slate-700">상위 고민 태그</h2><p class="text-sm text-slate-400 mt-0.5">전체 세션 기준</p></div>
+              <div class="px-5 py-4"><canvas id="chConcern" height="240"></canvas></div>
+            </div>
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm lg:col-span-3">
+              <div class="px-6 py-4 border-b border-slate-100"><h2 class="text-base font-semibold text-slate-700">심리 점수 분포</h2><p class="text-sm text-slate-400 mt-0.5">평균 62.4점</p></div>
+              <div class="px-5 py-5"><canvas id="chScore" height="240"></canvas></div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-5 gap-5">
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm lg:col-span-2">
+              <div class="px-6 py-4 border-b border-slate-100"><h2 class="text-base font-semibold text-slate-700">성별 분포</h2></div>
+              <div class="px-5 py-5"><canvas id="chGender" height="200"></canvas></div>
+            </div>
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm lg:col-span-3">
+              <div class="px-6 py-4 border-b border-slate-100"><h2 class="text-base font-semibold text-slate-700">연령대 분포</h2><p class="text-sm text-slate-400 mt-0.5">평균 24.6세</p></div>
+              <div class="px-5 py-5"><canvas id="chAge" height="200"></canvas></div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm">
+            <div class="px-6 py-4 border-b border-slate-100"><h2 class="text-base font-semibold text-slate-700">지역별 고민 건수</h2><p class="text-sm text-slate-400 mt-0.5">전체 지역 · 상위 고민 태그 3개</p></div>
+            <div class="overflow-y-auto" style="max-height:480px">
+              <table class="w-full text-sm">
+                <thead class="sticky top-0 bg-slate-50 text-slate-500 text-xs uppercase tracking-wide">
+                  <tr><th class="px-5 py-3 text-left font-semibold">지역</th><th class="px-4 py-3 text-left font-semibold">1위</th><th class="px-4 py-3 text-left font-semibold">2위</th><th class="px-4 py-3 text-left font-semibold">3위</th><th class="px-4 py-3 text-right font-semibold">총 건수</th></tr>
                 </thead>
-                <tbody id="bBody"></tbody>
+                <tbody id="regionBody" class="divide-y divide-slate-100"></tbody>
               </table>
             </div>
-            <div id="bPager" class="flex m-4 justify-center items-center gap-4"></div>
           </div>
         </div>
       </section>
+
+      <!-- ===== 미구현 안내 ===== -->
+      <section id="view-placeholder" hidden class="p-8">
+        <div class="bg-white rounded-lg border border-slate-200 p-12 text-center">
+          <div class="mx-auto mb-4 w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 text-xl">🛠️</div>
+          <h2 class="font-semibold text-slate-700">이 페이지는 데모에 포함되지 않았습니다</h2>
+          <p class="text-sm text-slate-400 mt-1.5">대시보드 · 기관/부스/장비 목록 · 세션 · 상담 통계를 둘러보세요.</p>
+          <button onclick="showView('dashboard')" class="mt-5 px-4 py-2 text-sm font-medium bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors">대시보드로</button>
+        </div>
+      </section>
+
     </main>
   </div>
 
   <script>
-    // ---------- 데이터 (datas.ts 일부) ----------
-    const institutions = [
-      { code: '1042-8731-5290-3618', name: '서울마음지원센터', region: '서울', createdAt: '2026-03-01', booths: 1, account: true },
-      { code: '2917-4053-8164-7325', name: '늘봄중학교', region: '경기', createdAt: '2026-03-03', booths: 2, account: true },
-      { code: '3784-6290-1537-4862', name: '한빛청소년복지관', region: '인천', createdAt: '2026-02-14', booths: 1, account: true },
-      { code: '4561-3872-9048-2193', name: '푸른나무재단', region: '서울', createdAt: '2025-11-22', booths: 2, account: false },
-      { code: '5438-1904-6273-8057', name: '다온심리상담센터', region: '부산', createdAt: '2026-01-08', booths: 1, account: true },
-      { code: '6205-7318-0492-5741', name: '강남구청소년상담복지센터', region: '서울', createdAt: '2025-12-17', booths: 1, account: true },
-      { code: '7381-2946-8107-6523', name: '서초여성가족플라자', region: '서울', createdAt: '2026-02-05', booths: 2, account: false },
-      { code: '8064-5173-2839-1407', name: '마포구립노인종합복지관', region: '서울', createdAt: '2025-10-30', booths: 1, account: true },
-      { code: '9152-6804-7361-2938', name: '은평천사원', region: '서울', createdAt: '2026-01-19', booths: 2, account: true },
-      { code: '2593-7410-8025-3186', name: '서울시립청소년미디어센터', region: '서울', createdAt: '2026-03-11', booths: 1, account: true },
-      { code: '8506-1927-5684-3012', name: '대구희망복지재단', region: '대구', createdAt: '2025-08-19', booths: 2, account: true },
-      { code: '2247-3506-9861-7034', name: '광주마음건강센터', region: '광주', createdAt: '2025-11-11', booths: 1, account: true },
-      { code: '5902-4361-7158-2806', name: '구로구정신건강복지센터', region: '서울', createdAt: '2026-03-19', booths: 2, account: true },
-      { code: '6179-8024-3597-4163', name: '희망나눔협회', region: '경기', createdAt: '2025-05-11', booths: 1, account: true },
+    // ---------- 데이터 ----------
+    const orgs = [
+      { code: '1042-8731-5290', name: '서울마음지원센터', region: '서울 강남구', start: '2025-03-01', end: '2026-03-01', last: '2026-05-20' },
+      { code: '2917-4053-8164', name: '늘봄중학교', region: '경기 성남시', start: '2025-03-03', end: '2026-06-30', last: '2026-05-28' },
+      { code: '3784-6290-1537', name: '한빛청소년복지관', region: '인천 부평구', start: '2025-02-14', end: '2026-06-14', last: '2026-05-25' },
+      { code: '4561-3872-9048', name: '푸른나무재단', region: '서울 마포구', start: '2024-11-22', end: '2026-06-10', last: '2026-05-12' },
+      { code: '5438-1904-6273', name: '다온심리상담센터', region: '부산 해운대구', start: '2025-01-08', end: '2026-07-08', last: '2026-05-27' },
+      { code: '6205-7318-0492', name: '강남구청소년상담복지센터', region: '서울 강남구', start: '2024-12-17', end: '2026-06-17', last: '2026-05-29' },
+      { code: '8064-5173-2839', name: '마포구립노인종합복지관', region: '서울 마포구', start: '2024-10-30', end: '2026-08-30', last: '2026-05-18' },
+      { code: '9152-6804-7361', name: '은평천사원', region: '서울 은평구', start: '2025-01-19', end: '2026-06-19', last: '2026-05-22' },
+      { code: '8506-1927-5684', name: '대구희망복지재단', region: '대구 수성구', start: '2024-08-19', end: '2026-09-19', last: '2026-05-15' },
+      { code: '2247-3506-9861', name: '광주마음건강센터', region: '광주 동구', start: '2024-11-11', end: '2026-06-25', last: '2026-05-26' },
+      { code: '5902-4361-7158', name: '구로구정신건강복지센터', region: '서울 구로구', start: '2025-03-19', end: '2027-03-19', last: '2026-05-24' },
+      { code: '6179-8024-3597', name: '희망나눔협회', region: '경기 수원시', start: '2024-05-11', end: '2026-11-11', last: '2026-05-10' },
     ]
     const booths = [
-      { code: '3821-0174-6593-2047', org: '서울마음지원센터', location: '1층 복도 끝 대기공간', pc: 'P-047', monitor: 'M-023', lte: '미할당', installedAt: '2024-03-15', status: '운영 중' },
-      { code: '1492-8830-2761-5038', org: '늘봄중학교', location: '본관 3층 위클래스', pc: 'P-012', monitor: 'M-041', lte: '미할당', installedAt: '2023-09-01', status: '운영 중' },
-      { code: '7263-4150-9882-3614', org: '한빛청소년복지관', location: '정문 옆 안내데스크', pc: 'P-088', monitor: 'M-005', lte: '미할당', installedAt: '2025-02-20', status: '운영 중' },
-      { code: '5047-2391-1480-7726', org: '푸른나무재단', location: '2층 상담실 앞 복도', pc: 'P-033', monitor: 'M-067', lte: '미할당', installedAt: '2024-11-07', status: '운영 중' },
-      { code: '9183-6702-3859-0241', org: '다온심리상담센터', location: '지하 1층 엘리베이터 옆', pc: 'P-061', monitor: 'M-089', lte: '미할당', installedAt: '2023-06-14', status: '미운영' },
-      { code: '2574-1063-8427-4915', org: '강남구청소년상담복지센터', location: '로비 우측 안내부스', pc: 'P-019', monitor: 'M-034', lte: 'L-003', installedAt: '2025-01-08', status: '운영 중' },
-      { code: '0391-5618-7204-8853', org: '마포구립노인종합복지관', location: '후문 행정동 앞', pc: 'P-042', monitor: 'M-056', lte: '미할당', installedAt: '2023-12-03', status: '서비스 중단' },
-      { code: '4762-0935-2148-6307', org: '은평천사원', location: '1층 원무과 입구', pc: '미할당', monitor: 'M-078', lte: '미할당', installedAt: '2026-03-01', status: '미운영' },
+      { uuid: 'BTH-0471', org: '서울마음지원센터', counselor: '김상담', region: '서울 강남구', pc: true, active: true, last: '2026-05-20' },
+      { uuid: 'BTH-0288', org: '늘봄중학교', counselor: '이은영', region: '경기 성남시', pc: true, active: true, last: '2026-05-28' },
+      { uuid: 'BTH-0153', org: '한빛청소년복지관', counselor: '-', region: '인천 부평구', pc: false, active: false, last: '-' },
+      { uuid: 'BTH-0612', org: '다온심리상담센터', counselor: '최민서', region: '부산 해운대구', pc: true, active: true, last: '2026-05-27' },
+      { uuid: 'BTH-0339', org: '강남구청소년상담복지센터', counselor: '정민호', region: '서울 강남구', pc: true, active: true, last: '2026-05-29' },
+      { uuid: 'BTH-0524', org: '은평천사원', counselor: '-', region: '서울 은평구', pc: false, active: false, last: '-' },
+      { uuid: 'BTH-0190', org: '대구희망복지재단', counselor: '권나현', region: '대구 수성구', pc: true, active: true, last: '2026-05-15' },
+      { uuid: 'BTH-0705', org: '광주마음건강센터', counselor: '손예은', region: '광주 동구', pc: true, active: true, last: '2026-05-26' },
     ]
-    const regions = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '강원', '경기', '경남', '경북', '전남', '전북', '충남', '충북', '제주']
+    const pcs = [
+      { mn: 'MPC-2024-001', model: 'NUC13ANKi5', maker: 'Intel', bios: 'AN0070', booth: 'BTH-0471', assigned: true },
+      { mn: 'MPC-2024-002', model: 'NUC13ANKi5', maker: 'Intel', bios: 'AN0070', booth: 'BTH-0288', assigned: true },
+      { mn: 'MPC-2024-003', model: 'Mini PC PN53', maker: 'ASUS', bios: 'PN5304', booth: '-', assigned: false },
+      { mn: 'MPC-2024-004', model: 'NUC13ANKi5', maker: 'Intel', bios: 'AN0070', booth: 'BTH-0612', assigned: true },
+      { mn: 'MPC-2024-005', model: 'Mini PC PN53', maker: 'ASUS', bios: 'PN5304', booth: '-', assigned: false },
+      { mn: 'MPC-2024-006', model: 'NUC13ANKi5', maker: 'Intel', bios: 'AN0070', booth: 'BTH-0339', assigned: true },
+      { mn: 'MPC-2024-007', model: 'EliteDesk 800', maker: 'HP', bios: 'U30', booth: '-', assigned: false },
+    ]
+    const ltes = [
+      { name: 'RT-강남-01', model: 'CPE-N300', serial: 'SN-9F2A11', loc: '서울 강남구' },
+      { name: 'RT-성남-01', model: 'CPE-N300', serial: 'SN-9F2A12', loc: '경기 성남시' },
+      { name: 'RT-부산-01', model: 'LTE-AX1800', serial: 'SN-7C8B03', loc: '부산 해운대구' },
+      { name: 'RT-대구-01', model: 'CPE-N300', serial: 'SN-9F2A21', loc: '대구 수성구' },
+      { name: 'RT-광주-01', model: 'LTE-AX1800', serial: 'SN-7C8B07', loc: '광주 동구' },
+    ]
+    const sessions = [
+      { dt: '2026-05-29 14:22', org: '강남구청소년상담복지센터', booth: 'BTH-0339', type: 'PSYCHOLOGICAL', sex: 'F', age: 17, score: 58.0, tags: ['학업', '불안'], pub: true, region: '서울 강남구' },
+      { dt: '2026-05-29 11:05', org: '늘봄중학교', booth: 'BTH-0288', type: 'CAREER', sex: 'M', age: 15, score: null, tags: ['진로'], pub: true, region: '경기 성남시' },
+      { dt: '2026-05-28 16:40', org: '다온심리상담센터', booth: 'BTH-0612', type: 'MBTI', sex: 'F', age: 22, score: 71.5, tags: ['교우관계'], pub: false, region: '부산 해운대구' },
+      { dt: '2026-05-28 10:13', org: '서울마음지원센터', booth: 'BTH-0471', type: 'PSYCHOLOGICAL', sex: 'M', age: 19, score: 44.0, tags: ['우울', '가족'], pub: true, region: '서울 강남구' },
+      { dt: '2026-05-27 15:58', org: '대구희망복지재단', booth: 'BTH-0190', type: 'PSYCHOLOGICAL', sex: 'F', age: 28, score: 66.5, tags: ['직장', '불안'], pub: true, region: '대구 수성구' },
+      { dt: '2026-05-27 09:30', org: '광주마음건강센터', booth: 'BTH-0705', type: 'CAREER', sex: 'M', age: 24, score: null, tags: ['진로'], pub: false, region: '광주 동구' },
+      { dt: '2026-05-26 13:47', org: '강남구청소년상담복지센터', booth: 'BTH-0339', type: 'PSYCHOLOGICAL', sex: 'F', age: 16, score: 52.0, tags: ['학업'], pub: true, region: '서울 강남구' },
+      { dt: '2026-05-26 10:02', org: '늘봄중학교', booth: 'BTH-0288', type: 'MBTI', sex: 'M', age: 14, score: 80.0, tags: ['자존감'], pub: true, region: '경기 성남시' },
+    ]
+    const regionStat = [
+      { region: '서울특별시', t3: [['학업', 142], ['교우관계', 98], ['불안', 64]], total: 412 },
+      { region: '경기도', t3: [['진로', 120], ['학업', 88], ['가족', 51]], total: 331 },
+      { region: '부산광역시', t3: [['교우관계', 76], ['우울', 52], ['진로', 40]], total: 210 },
+      { region: '대구광역시', t3: [['불안', 60], ['직장', 44], ['학업', 33]], total: 168 },
+      { region: '광주광역시', t3: [['진로', 51], ['자존감', 38], ['교우관계', 27]], total: 142 },
+      { region: '인천광역시', t3: [['학업', 47], ['가족', 31], ['불안', 22]], total: 121 },
+    ]
+    const regions = [...new Set(orgs.map(o => o.region.split(' ')[0]))]
 
-    // ---------- 화면/드롭다운 ----------
-    function enterApp(e) { e.preventDefault(); document.getElementById('login').hidden = true; document.getElementById('app').hidden = false; showView('dashboard') }
-    function logout() { document.getElementById('app').hidden = true; document.getElementById('login').hidden = false; closeDd() }
-    function showView(name) {
-      ['dashboard', 'orglist', 'boothlist'].forEach((v) => { document.getElementById('view-' + v).hidden = v !== name })
-      closeDd(); window.scrollTo(0, 0)
-      if (name === 'orglist') renderOrg()
-      if (name === 'boothlist') renderBooth()
+    // ---------- 화면 전환 ----------
+    function togglePw(){ const p=document.getElementById('pw'); p.type = p.type==='password'?'text':'password' }
+    function enterApp(e){ e.preventDefault(); document.getElementById('login').hidden=true; document.getElementById('app').hidden=false; showView('dashboard') }
+    function logout(){ document.getElementById('app').hidden=true; document.getElementById('login').hidden=false; closeDd() }
+    const VIEWS = ['dashboard','org','booth','minipc','lte','sessions','statistics','placeholder']
+    const GROUP = { dashboard:'dashboard', org:'org', booth:'booth', minipc:'device', lte:'device', sessions:'analytics', statistics:'analytics' }
+    function showView(name){
+      VIEWS.forEach(v => document.getElementById('view-'+v).hidden = v !== name)
+      const g = GROUP[name]
+      document.querySelectorAll('.navbtn').forEach(b => {
+        const active = b.dataset.navgroup === g
+        b.classList.toggle('text-blue-600', active); b.classList.toggle('bg-blue-50', active)
+        b.classList.toggle('text-slate-600', !active)
+      })
+      closeDd(); window.scrollTo(0,0)
+      if (name==='org') renderOrg()
+      if (name==='booth') renderBooth()
+      if (name==='minipc') renderPc()
+      if (name==='lte') renderLte()
+      if (name==='sessions') renderSes()
+      if (name==='statistics') initCharts()
     }
-    let openMenu = null
-    function toggleDd(key) {
-      openMenu = openMenu === key ? null : key
-      document.querySelectorAll('[data-menu]').forEach((m) => { m.hidden = m.dataset.menu !== openMenu })
-      document.querySelectorAll('[data-arrow]').forEach((a) => { a.textContent = a.dataset.arrow === openMenu ? '▲' : '▼' })
+    let openMenu=null
+    function toggleDd(k){ openMenu = openMenu===k?null:k; document.querySelectorAll('[data-menu]').forEach(m=>m.hidden=m.dataset.menu!==openMenu); document.querySelectorAll('[data-arrow]').forEach(a=>a.textContent=a.dataset.arrow===openMenu?'▲':'▼') }
+    function closeDd(){ openMenu=null; document.querySelectorAll('[data-menu]').forEach(m=>m.hidden=true); document.querySelectorAll('[data-arrow]').forEach(a=>a.textContent='▼') }
+    document.addEventListener('click', e => { if(!e.target.closest('.dd')) closeDd() })
+
+    // ---------- 대시보드 ----------
+    function renderDash(){
+      const totalPc = pcs.length, asgPc = pcs.filter(p=>p.assigned).length
+      const totalLte = ltes.length, asgLte = 3
+      const cards = [
+        { title:'기관', total: orgs.length, sub:null, v:'org' },
+        { title:'부스', total: booths.length, sub:`운영 중 ${booths.filter(b=>b.active).length}`, v:'booth' },
+        { title:'미니PC', total: totalPc, sub:`할당 ${asgPc} / 미할당 ${totalPc-asgPc}`, v:'minipc' },
+        { title:'LTE 라우터', total: totalLte, sub:`할당 ${asgLte} / 미할당 ${totalLte-asgLte}`, v:'lte' },
+      ]
+      document.getElementById('dashCards').innerHTML = cards.map(c=>`
+        <div onclick="showView('${c.v}')" class="bg-white rounded-lg border border-slate-200 shadow-sm px-6 py-5 cursor-pointer hover:shadow-md transition-shadow">
+          <p class="text-sm font-medium text-slate-500 mb-1">${c.title}</p>
+          <p class="text-3xl font-bold text-slate-800">${c.total}</p>
+          ${c.sub?`<p class="text-sm text-slate-400 mt-2">${c.sub}</p>`:''}
+        </div>`).join('')
+
+      const panel = (title,v,rows) => `
+        <div class="bg-white rounded-lg border border-slate-200 shadow-sm">
+          <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+            <h2 class="text-base font-semibold text-slate-700">${title}</h2>
+            <button onclick="showView('${v}')" class="text-sm text-slate-400 hover:text-slate-600 transition-colors">전체 보기</button>
+          </div>
+          <div class="divide-y divide-slate-100 max-h-64 overflow-y-auto">${rows}</div>
+        </div>`
+      const recent = booths.filter(b=>b.active).slice(0,5).map(b=>`
+        <div class="px-5 py-3 flex justify-between items-center hover:bg-slate-50 cursor-pointer transition-colors">
+          <div><p class="text-sm font-mono text-slate-700">${b.uuid}</p><p class="text-xs text-slate-400 mt-0.5">${b.org}</p></div>
+          <p class="text-xs text-slate-400">${b.last}</p></div>`).join('')
+      const idlePc = pcs.filter(p=>!p.assigned).slice(0,5).map(p=>`
+        <div class="px-5 py-3 flex justify-between items-center hover:bg-slate-50 cursor-pointer transition-colors">
+          <p class="text-sm font-mono text-slate-700">${p.mn}</p><p class="text-xs text-slate-400">${p.model}</p></div>`).join('')
+      const idleLte = ltes.slice(3).map(l=>`
+        <div class="px-5 py-3 flex justify-between items-center hover:bg-slate-50 cursor-pointer transition-colors">
+          <p class="text-sm font-mono text-slate-700">${l.name}</p><p class="text-xs text-slate-400">${l.model}</p></div>`).join('')
+      const expiring = orgs.filter(o=>o.end<='2026-06-30').slice(0,5).map(o=>`
+        <div class="px-5 py-3 flex justify-between items-center hover:bg-slate-50 cursor-pointer transition-colors">
+          <div><p class="text-sm text-slate-700">${o.name}</p><p class="text-xs font-mono text-slate-400 mt-0.5">${o.code}</p></div>
+          <p class="text-xs text-red-400 font-medium">${o.end}</p></div>`).join('')
+      document.getElementById('dashPanels').innerHTML =
+        panel('최근 세션 부스','booth',recent) + panel('미할당 미니PC','minipc',idlePc) +
+        panel('미할당 LTE 라우터','lte',idleLte) + panel('계약 만료 임박','org',expiring)
     }
-    function closeDd() { openMenu = null; document.querySelectorAll('[data-menu]').forEach((m) => (m.hidden = true)); document.querySelectorAll('[data-arrow]').forEach((a) => (a.textContent = '▼')) }
-    document.addEventListener('click', (e) => { if (!e.target.closest('.dd')) closeDd() })
 
     // ---------- 기관 목록 ----------
-    let oSort = 'desc', oPage = 1
-    document.getElementById('oRegion').innerHTML = '<option value="">전체 지역</option>' + regions.map((r) => `<option value="${r}">${r}</option>`).join('')
-    function oToggleSort() { oSort = oSort === 'desc' ? 'asc' : 'desc'; document.getElementById('oSortTh').textContent = '둥록 일자 ' + (oSort === 'desc' ? '▼' : '▲'); renderOrg() }
-    function resetOrg() { oSearch.value = ''; oRegion.value = ''; oAccount.value = ''; oSize.value = '10'; oPage = 1; renderOrg() }
-    function renderOrg() {
-      const q = oSearch.value.trim(), region = oRegion.value, account = oAccount.value, size = +oSize.value
-      let rows = institutions.filter((i) => {
-        if (region && i.region !== region) return false
-        if (account && String(i.account) !== account) return false
-        if (q && !i.code.includes(q) && !i.name.includes(q)) return false
-        return true
-      })
-      rows.sort((a, b) => oSort === 'asc' ? new Date(a.createdAt) - new Date(b.createdAt) : new Date(b.createdAt) - new Date(a.createdAt))
-      const total = rows.length, totalPage = Math.max(1, Math.ceil(total / size))
-      if (oPage > totalPage) oPage = totalPage
-      const start = (oPage - 1) * size, pageData = rows.slice(start, start + size)
-      document.getElementById('oBody').innerHTML = pageData.map((i) => `
+    document.getElementById('orgRegion').innerHTML = '<option value="">전체 지역</option>' + regions.map(r=>`<option value="${r}">${r}</option>`).join('')
+    function renderOrg(){
+      const q=document.getElementById('orgSearch').value.trim(), rg=document.getElementById('orgRegion').value
+      const rows = orgs.filter(o=>(!q||o.name.includes(q))&&(!rg||o.region.startsWith(rg)))
+      document.getElementById('orgBody').innerHTML = rows.map(o=>`
         <tr class="hover:bg-slate-50 cursor-pointer transition-colors">
-          <td class="px-5 py-4 text-base font-mono text-slate-600">${i.code}</td>
-          <td class="px-5 py-4 text-base font-mono text-slate-600">${i.name}</td>
-          <td class="px-5 py-4 text-base font-mono text-slate-600">${i.createdAt}</td>
-          <td class="px-5 py-4 text-base font-mono text-slate-600">${i.booths}개</td>
-          <td class="px-5 py-4 text-base"><span class="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-medium ${i.account ? 'bg-green-50 text-green-700' : 'bg-slate-100 text-slate-500'}">${i.account ? '있음' : '없음'}</span></td>
-          <td class="px-5 py-4 text-base font-mono text-slate-600">${i.region}</td>
-        </tr>`).join('')
-      document.getElementById('oCount').textContent = `${total}개 중 ${total ? start + 1 : 0}-${Math.min(start + size, total)}`
-      let pager = `<button onclick="oPage=1;renderOrg()" class="px-2 py-1 text-base text-slate-600 hover:text-slate-800 ${oPage === 1 ? 'opacity-30' : ''}">${'<<'}</button>`
-      for (let n = 1; n <= totalPage; n++) pager += `<button onclick="oPage=${n};renderOrg()" class="px-3 py-1 text-base rounded-md transition-colors ${oPage === n ? 'bg-blue-500 text-white font-medium' : 'hover:bg-slate-100 text-slate-600'}">${n}</button>`
-      pager += `<button onclick="oPage=${totalPage};renderOrg()" class="px-2 py-1 text-base text-slate-600 hover:text-slate-800 ${oPage === totalPage ? 'opacity-30' : ''}">${'>>'}</button>`
-      document.getElementById('oPager').innerHTML = pager
+          <td class="px-5 py-4 text-base font-mono text-slate-600">${o.code}</td>
+          <td class="px-5 py-4 text-base text-slate-600">${o.name}</td>
+          <td class="px-5 py-4 text-base text-slate-600">${o.region}</td>
+          <td class="px-5 py-4 text-base text-slate-600">${o.start}</td>
+          <td class="px-5 py-4 text-base text-slate-600">${o.end}</td>
+          <td class="px-5 py-4 text-base text-slate-600">${o.last}</td></tr>`).join('')
+      document.getElementById('orgCount').textContent = `총 ${rows.length}개`
+    }
+    // ---------- 부스 목록 ----------
+    function renderBooth(){
+      const q=document.getElementById('boothSearch').value.trim(), st=document.getElementById('boothStatus').value, pc=document.getElementById('boothPc').value
+      const rows = booths.filter(b=>(!q||b.org.includes(q))&&(!st||(st==='in_use')===b.active)&&(!pc||(pc==='true')===b.pc))
+      document.getElementById('boothBody').innerHTML = rows.map(b=>`
+        <tr class="hover:bg-slate-50 cursor-pointer transition-colors">
+          <td class="px-5 py-4 text-base font-mono text-slate-600">${b.uuid}</td>
+          <td class="px-5 py-4 text-base text-slate-600">${b.org}</td>
+          <td class="px-5 py-4 text-base text-slate-600">${b.counselor}</td>
+          <td class="px-5 py-4 text-base text-slate-600">${b.region}</td>
+          <td class="px-5 py-4 text-base">${b.pc?'<span class="text-green-600 font-medium">할당</span>':'<span class="text-slate-400">미할당</span>'}</td>
+          <td class="px-5 py-4 text-base">${b.active?'<span class="text-green-600 font-medium">운영 중</span>':'<span class="text-slate-400">미운영</span>'}</td>
+          <td class="px-5 py-4 text-base text-slate-600">${b.last}</td></tr>`).join('')
+      document.getElementById('boothCount').textContent = `총 ${rows.length}개`
+    }
+    // ---------- 미니PC ----------
+    function renderPc(){
+      const st=document.getElementById('pcStatus').value
+      const rows = pcs.filter(p=>!st||(st==='in_use')===p.assigned)
+      document.getElementById('pcBody').innerHTML = rows.map(p=>`
+        <tr class="hover:bg-slate-50 cursor-pointer transition-colors">
+          <td class="px-5 py-4 text-base font-mono text-slate-600">${p.mn}</td>
+          <td class="px-5 py-4 text-base text-slate-600">${p.model}</td>
+          <td class="px-5 py-4 text-base text-slate-600">${p.maker}</td>
+          <td class="px-5 py-4 text-base text-slate-600">${p.bios}</td>
+          <td class="px-5 py-4 text-base font-mono text-slate-600">${p.booth}</td>
+          <td class="px-5 py-4 text-base">${p.assigned?'<span class="text-green-600 font-medium">할당</span>':'<span class="text-slate-400">미할당</span>'}</td></tr>`).join('')
+      document.getElementById('pcCount').textContent = `총 ${rows.length}개`
+    }
+    // ---------- LTE ----------
+    function renderLte(){
+      const st=document.getElementById('lteStatus').value
+      const rows = ltes.filter((_,i)=>!st||(st==='in_use')===(i<3))
+      document.getElementById('lteBody').innerHTML = rows.map(l=>`
+        <tr class="hover:bg-slate-50 cursor-pointer transition-colors">
+          <td class="px-5 py-4 text-base text-slate-600">${l.name}</td>
+          <td class="px-5 py-4 text-base text-slate-600">${l.model}</td>
+          <td class="px-5 py-4 text-base font-mono text-slate-600">${l.serial}</td>
+          <td class="px-5 py-4 text-base text-slate-600">${l.loc}</td></tr>`).join('')
+      document.getElementById('lteCount').textContent = `총 ${rows.length}개`
+    }
+    // ---------- 세션 ----------
+    const SES_LABEL = { PSYCHOLOGICAL:'심리', CAREER:'진로', MBTI:'MBTI' }
+    function renderSes(){
+      const q=document.getElementById('sesSearch').value.trim(), tp=document.getElementById('sesType').value
+      const rows = sessions.filter(s=>(!q||s.org.includes(q))&&(!tp||s.type===tp))
+      document.getElementById('sesBody').innerHTML = rows.map(s=>`
+        <tr class="hover:bg-slate-50 transition-colors">
+          <td class="px-5 py-4 text-base text-slate-600 whitespace-nowrap">${s.dt}</td>
+          <td class="px-5 py-4 text-base text-slate-600">${s.org}</td>
+          <td class="px-5 py-4 text-base font-mono text-slate-600">${s.booth}</td>
+          <td class="px-5 py-4"><span class="px-2 py-0.5 rounded-full text-sm font-medium bg-blue-50 text-blue-600">${SES_LABEL[s.type]}</span></td>
+          <td class="px-5 py-4 text-base text-slate-600 whitespace-nowrap">${s.sex==='F'?'여':'남'} / ${s.age}세</td>
+          <td class="px-5 py-4 text-base text-slate-600 whitespace-nowrap">${s.score!=null?s.score.toFixed(1)+'점':'-'}</td>
+          <td class="px-5 py-4"><div class="flex flex-wrap gap-1">${s.tags.map(t=>`<span class="px-2 py-0.5 rounded-full text-xs bg-slate-100 text-slate-600">${t}</span>`).join('')}</div></td>
+          <td class="px-5 py-4"><span class="px-2 py-0.5 rounded-full text-xs font-medium ${s.pub?'bg-green-50 text-green-600':'bg-slate-100 text-slate-400'}">${s.pub?'공개':'비공개'}</span></td>
+          <td class="px-5 py-4 text-base text-slate-600">${s.region}</td></tr>`).join('')
+      document.getElementById('sesCount').textContent = `총 ${rows.length}개`
     }
 
-    // ---------- 부스 목록 ----------
-    let bSort = 'desc', bPage = 1
-    function bToggleSort() { bSort = bSort === 'desc' ? 'asc' : 'desc'; document.getElementById('bSortTh').textContent = '부스 설치 일자 ' + (bSort === 'desc' ? '▼' : '▲'); renderBooth() }
-    function resetBooth() { bSearch.value = ''; bStatus.value = ''; bDevice.value = ''; bSize.value = '10'; bPage = 1; renderBooth() }
-    function renderBooth() {
-      const q = bSearch.value.trim(), status = bStatus.value, dev = bDevice.value, size = +bSize.value
-      let rows = booths.filter((i) => {
-        if (status && i.status !== status) return false
-        if (dev === 'pc' && i.pc !== '미할당') return false
-        if (dev === 'monitor' && i.monitor !== '미할당') return false
-        if (dev === 'lte' && i.lte !== '미할당') return false
-        if (q && !i.code.includes(q) && !i.org.includes(q)) return false
-        return true
-      })
-      rows.sort((a, b) => bSort === 'asc' ? new Date(a.installedAt) - new Date(b.installedAt) : new Date(b.installedAt) - new Date(a.installedAt))
-      const total = rows.length, totalPage = Math.max(1, Math.ceil(total / size))
-      if (bPage > totalPage) bPage = totalPage
-      const start = (bPage - 1) * size, pageData = rows.slice(start, start + size)
-      document.getElementById('bBody').innerHTML = pageData.map((i) => `
-        <tr class="cursor-pointer hover:bg-stone-200">
-          <td class="px-4 py-3 border-b border-dashed">${i.code}</td>
-          <td class="px-4 py-3 border-b border-dashed">${i.org}</td>
-          <td class="px-4 py-3 border-b border-dashed">${i.location}</td>
-          <td class="px-4 py-3 border-b border-dashed">${i.pc !== '미할당' ? 'P : O' : 'P : X'} | ${i.monitor !== '미할당' ? ' M : O' : ' M : X'} | ${i.lte !== '미할당' ? ' L : O' : ' L : X'}</td>
-          <td class="px-4 py-3 border-b border-dashed">${i.installedAt}</td>
-          <td class="px-4 py-2 border-b border-dashed">${i.status}</td>
-        </tr>`).join('')
-      let pager = `<button onclick="bPage=1;renderBooth()">${'<<'}</button>`
-      for (let n = 1; n <= totalPage; n++) pager += `<button onclick="bPage=${n};renderBooth()" class="${bPage === n ? 'font-bold px-3 py-1' : 'px-3 py-1'}">${n}</button>`
-      pager += `<button onclick="bPage=${totalPage};renderBooth()">${'>>'}</button>`
-      document.getElementById('bPager').innerHTML = pager
+    // ---------- 통계 차트 ----------
+    let charts = {}, chartsInit = false
+    const trendData = {
+      daily: { labels: ['05-16','05-17','05-18','05-19','05-20','05-21','05-22','05-23','05-24','05-25','05-26','05-27','05-28','05-29'], data:[180,210,195,240,260,170,150,225,248,270,255,288,302,276] },
+      weekly:{ labels: ['4월3주','4월4주','5월1주','5월2주','5월3주','5월4주'], data:[1180,1320,1410,1290,1505,1620] },
+      monthly:{ labels: ['1월','2월','3월','4월','5월'], data:[4200,3980,5120,4870,5340] },
     }
+    function initCharts(){
+      if (chartsInit || !window.Chart) return
+      chartsInit = true
+      Chart.defaults.font.family = "Pretendard, system-ui, sans-serif"
+      Chart.defaults.color = '#94a3b8'
+      const grid = { color:'#e2e8f0', drawBorder:false }
+      charts.trend = new Chart(document.getElementById('chTrend'), {
+        type:'line',
+        data:{ labels: trendData.daily.labels, datasets:[{ label:'세션 수', data: trendData.daily.data, borderColor:'#3b82f6', backgroundColor:'rgba(59,130,246,0.08)', fill:true, tension:0.35, pointRadius:2, pointBackgroundColor:'#3b82f6', borderWidth:2 }] },
+        options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} }, scales:{ y:{ grid, ticks:{callback:v=>v+'건'} }, x:{ grid:{display:false} } } }
+      })
+      charts.concern = new Chart(document.getElementById('chConcern'), {
+        type:'bar',
+        data:{ labels:['학업','교우관계','진로','가족','자존감','불안'], datasets:[{ label:'건수', data:[420,310,280,190,150,120], backgroundColor:['#3b82f6','#60a5fa','#93c5fd','#bfdbfe','#93c5fd','#60a5fa'], borderRadius:4, barThickness:18 }] },
+        options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ x:{grid, ticks:{callback:v=>v+'건'}}, y:{grid:{display:false}} } }
+      })
+      charts.score = new Chart(document.getElementById('chScore'), {
+        type:'bar',
+        data:{ labels:['0-20','20-40','40-60','60-80','80-100'], datasets:[{ label:'인원', data:[120,340,820,910,540], backgroundColor:'#3b82f6', borderRadius:5, maxBarThickness:56 }] },
+        options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ y:{grid, ticks:{callback:v=>v+'명'}}, x:{grid:{display:false}, ticks:{callback:(v,i)=>['0-20','20-40','40-60','60-80','80-100'][i]+'점'}} } }
+      })
+      charts.gender = new Chart(document.getElementById('chGender'), {
+        type:'doughnut',
+        data:{ labels:['여성','남성'], datasets:[{ data:[1180,923], backgroundColor:['#fb7185','#3b82f6'], borderWidth:0 }] },
+        options:{ responsive:true, maintainAspectRatio:false, cutout:'62%', plugins:{ legend:{ position:'bottom' } } }
+      })
+      charts.age = new Chart(document.getElementById('chAge'), {
+        type:'bar',
+        data:{ labels:['10대','20대','30대','40대','50대+'], datasets:[{ label:'인원', data:[760,640,410,210,83], backgroundColor:'#3b82f6', borderRadius:5, maxBarThickness:56 }] },
+        options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ y:{grid, ticks:{callback:v=>v+'명'}}, x:{grid:{display:false}} } }
+      })
+      document.getElementById('regionBody').innerHTML = regionStat.map(r=>`
+        <tr class="hover:bg-slate-50">
+          <td class="px-5 py-3 text-slate-700 font-medium">${r.region}</td>
+          ${[0,1,2].map(i=>`<td class="px-4 py-3 text-slate-600">${r.t3[i]?`${r.t3[i][0]} <span class="text-slate-400 text-xs">(${r.t3[i][1]})</span>`:'<span class="text-slate-300">-</span>'}</td>`).join('')}
+          <td class="px-4 py-3 text-right text-slate-500">${r.total.toLocaleString()}건</td></tr>`).join('')
+    }
+    function setTrend(g, btn){
+      document.querySelectorAll('.trend-btn').forEach(b=>{ b.classList.remove('bg-blue-500','text-white'); b.classList.add('text-slate-500') })
+      btn.classList.add('bg-blue-500','text-white'); btn.classList.remove('text-slate-500')
+      if (charts.trend){ charts.trend.data.labels = trendData[g].labels; charts.trend.data.datasets[0].data = trendData[g].data; charts.trend.update() }
+    }
+
+    renderDash()
   </script>
 </body>
 </html>

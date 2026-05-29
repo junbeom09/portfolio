@@ -54,13 +54,13 @@ export default function Skills() {
           <span className="font-mono text-black/25 dark:text-white/20 text-xs tracking-widest uppercase">Skills</span>
         </motion.div>
 
-        <div className="flex flex-col lg:flex-row gap-3">
+        <div className="flex flex-col lg:flex-row gap-4">
           {/* Tab list */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.5, delay: 0.05 }}
-            className="lg:w-52 flex flex-row lg:flex-col gap-1 overflow-x-auto lg:overflow-visible flex-shrink-0 pb-1 lg:pb-0 -mx-4 px-4 lg:mx-0 lg:px-0"
+            className="lg:w-60 flex flex-row lg:flex-col gap-1.5 overflow-x-auto lg:overflow-visible flex-shrink-0 pb-1 lg:pb-0 -mx-4 px-4 lg:mx-0 lg:px-0"
           >
             {skills.map((skill, idx) => {
               const isActive = active === skill.id
@@ -90,9 +90,9 @@ export default function Skills() {
             transition={{ duration: 0.5, delay: 0.1 }}
             className="flex-1 min-w-0 rounded-xl border border-black/[0.07] dark:border-white/[0.07] bg-white dark:bg-white/[0.03] overflow-hidden"
           >
-            <div className="px-4 md:px-5 py-3.5 md:py-4 border-b border-black/[0.05] dark:border-white/[0.05]">
-              <h3 className="font-semibold text-black dark:text-white text-sm mb-0.5">{current.title}</h3>
-              <p className="text-xs text-black/35 dark:text-white/30">{current.desc}</p>
+            <div className="px-5 md:px-7 py-4 md:py-5 border-b border-black/[0.05] dark:border-white/[0.05]">
+              <h3 className="font-semibold text-black dark:text-white text-base mb-1">{current.title}</h3>
+              <p className="text-sm text-black/35 dark:text-white/30">{current.desc}</p>
               <div className="flex flex-wrap gap-1.5 mt-2">
                 {current.tags.map((tag) => (
                   <span key={tag} className="text-[11px] px-2 py-0.5 border border-black/8 dark:border-white/8 text-black/35 dark:text-white/30 rounded-md">
@@ -102,7 +102,7 @@ export default function Skills() {
               </div>
             </div>
 
-            <div className="p-4 md:p-6" style={{ minHeight: '360px' }}>
+            <div className="p-5 md:p-8" style={{ minHeight: '440px' }}>
               <motion.div
                 key={active}
                 initial={{ opacity: 0, y: 8 }}
