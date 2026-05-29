@@ -4,260 +4,228 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>헬프티처 관리자 · UI 데모</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] } } },
+      theme: { extend: { maxWidth: { 300: '75rem' } } },
     }
   </script>
   <style>
-    body { font-family: 'Inter', sans-serif; }
     [hidden] { display: none !important; }
+    /* ===== 반응형 보정: 좁은 화면에서만 가로 스크롤 허용 (데스크톱 무변경) ===== */
+    @media (max-width: 1000px) {
+      #app > header { overflow-x: auto; }
+      #view-orglist .bg-white { overflow-x: auto; }
+      #view-orglist table, #view-boothlist table { min-width: 760px; }
+      #view-boothlist .max-w-300 { overflow-x: auto; }
+    }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800">
-
-  <!-- 데모 안내 배너 -->
-  <div class="fixed bottom-4 right-4 z-50 bg-slate-900/90 text-white text-xs px-3 py-2 rounded-lg shadow-lg backdrop-blur">
+<body>
+  <div class="fixed bottom-4 right-4 z-[9999] bg-slate-900/90 text-white text-xs px-3 py-2 rounded-lg shadow-lg">
     UI/UX 데모 · 실제 데이터·기능은 동작하지 않습니다
   </div>
 
-  <!-- ================= 로그인 화면 ================= -->
-  <section id="login" class="min-h-screen flex items-center justify-center bg-slate-100 px-4">
+  <!-- ============ 로그인 ((auth)/login) ============ -->
+  <section id="login" class="min-h-screen flex items-center justify-center bg-slate-100">
     <div class="w-full max-w-sm">
-      <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-7">
-        <div class="text-center mb-7">
-          <div class="mx-auto mb-3 w-16 h-16 rounded-2xl bg-blue-500 flex items-center justify-center">
-            <span class="text-white text-2xl font-extrabold">H</span>
-          </div>
-          <h1 class="text-lg font-bold text-slate-800">헬프티처 관리자</h1>
-          <p class="text-sm text-slate-500 mt-1">관리자 페이지에 로그인 하세요.</p>
+      <div class="bg-white rounded-lg border border-slate-200 shadow-sm p-6">
+        <div class="text-center mb-6">
+          <img src="helpteacherLogo.png" alt="logo image" class="h-32 mx-auto object-contain" />
+          <p class="text-base text-slate-500 mt-3">관리자 페이지에 로그인 하세요.</p>
         </div>
-        <form onsubmit="enterApp(event)" class="flex flex-col gap-4">
+        <form class="flex flex-col gap-5" onsubmit="enterApp(event)">
           <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1.5">아이디</label>
-            <input type="text" value="admin" class="w-full border border-slate-200 rounded-lg py-2.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+            <label for="id" class="block text-base font-medium text-slate-700 mb-2">아이디</label>
+            <input type="text" id="id" value="admin" placeholder="아이디 입력"
+              class="w-full border border-slate-200 rounded-md py-2.5 px-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500" />
           </div>
           <div>
-            <label class="block text-sm font-medium text-slate-700 mb-1.5">비밀번호</label>
-            <input type="password" value="000000" class="w-full border border-slate-200 rounded-lg py-2.5 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+            <label for="password" class="block text-base font-medium text-slate-700 mb-2">비밀번호</label>
+            <input type="password" id="password" value="000000" placeholder="비밀번호 입력"
+              class="w-full border border-slate-200 rounded-md py-2.5 px-3 text-base focus:outline-none focus:ring-2 focus:ring-blue-500" />
           </div>
-          <button type="submit" class="w-full py-2.5 px-4 text-sm font-semibold bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors mt-1">로그인</button>
+          <button type="submit"
+            class="w-full py-2.5 px-4 text-base font-medium bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors mt-1">login</button>
         </form>
       </div>
-      <p class="text-center text-xs text-slate-400 mt-4">데모 계정이 입력되어 있어요. 그대로 로그인하세요.</p>
     </div>
   </section>
 
-  <!-- ================= 관리자 앱 ================= -->
-  <div id="app" hidden class="min-h-screen flex flex-col">
+  <!-- ============ 관리자 ((admin)/layout) ============ -->
+  <div id="app" hidden class="min-h-screen flex flex-col bg-slate-50">
 
-    <!-- 헤더 -->
-    <header class="h-14 bg-white border-b border-slate-200 flex items-center px-6 sticky top-0 z-30">
-      <button onclick="showView('dashboard')" class="flex items-center gap-2 mr-8">
-        <span class="w-7 h-7 rounded-lg bg-blue-500 flex items-center justify-center text-white text-sm font-extrabold">H</span>
-        <span class="font-bold text-slate-800">헬프티처</span>
-      </button>
+    <header class="h-14 bg-white border-b border-slate-200 flex items-center px-6 shdow-sm">
+      <div class="h-9 mr-8">
+        <a href="#" onclick="showView('dashboard');return false">
+          <img src="helpteacherLogo.png" alt="로고 이미지" class="block object-contain h-full" />
+        </a>
+      </div>
 
-      <nav class="flex gap-x-1 mr-auto items-center">
-        <button onclick="showView('dashboard')" data-nav="dashboard" class="nav-btn px-3 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors">대시보드</button>
+      <div class="flex gap-x-1 mr-auto">
+        <a href="#" onclick="showView('dashboard');return false">
+          <button class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover: bg-slate-100 rounded-md transition-colors">대시보드</button>
+        </a>
 
+        <!-- 기관 관리 -->
         <div class="relative dd">
-          <button onclick="toggleDd(this)" class="px-3 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors flex items-center gap-1">기관 관리 <span class="text-[10px] text-slate-400">▼</span></button>
-          <div class="dd-menu hidden absolute left-0 mt-1 w-44 bg-white border border-slate-200 rounded-lg shadow-lg py-1 z-40">
-            <button onclick="showView('placeholder')" class="w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50">기관 코드 발급</button>
-            <button onclick="showView('orgs')" class="w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50">기관 목록</button>
+          <button onclick="toggleDd('org')" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors flex items-center gap-1">
+            기관 관리 <span class="text-xs text-slate-400" data-arrow="org">▼</span>
+          </button>
+          <div data-menu="org" hidden class="absolute top-full left-0 mt-1 bg-white border border-slate-200 rouded-md shadow-lg min-w-max z-50">
+            <a href="#" onclick="showView('dashboard');return false" class="block px-4 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors first:rounded-t-md last:rounded-b-md">기관 코드 발급</a>
+            <a href="#" onclick="showView('orglist');return false" class="block px-4 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors first:rounded-t-md last:rounded-b-md">기관 목록</a>
           </div>
         </div>
 
+        <!-- 부스 관리 -->
         <div class="relative dd">
-          <button onclick="toggleDd(this)" class="px-3 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors flex items-center gap-1">부스 관리 <span class="text-[10px] text-slate-400">▼</span></button>
-          <div class="dd-menu hidden absolute left-0 mt-1 w-44 bg-white border border-slate-200 rounded-lg shadow-lg py-1 z-40">
-            <button onclick="showView('placeholder')" class="w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50">부스 코드 발급</button>
-            <button onclick="showView('booths')" class="w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50">부스 목록</button>
+          <button onclick="toggleDd('booth')" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors flex items-center gap-1">
+            부스 관리 <span class="text-xs text-slate-400" data-arrow="booth">▼</span>
+          </button>
+          <div data-menu="booth" hidden class="absolute top-full left-0 mt-1 bg-white border border-slate-200 rouded-md shadow-lg min-w-max z-50">
+            <a href="#" onclick="showView('dashboard');return false" class="block px-4 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors first:rounded-t-md last:rounded-b-md">부스 코드 발급</a>
+            <a href="#" onclick="showView('boothlist');return false" class="block px-4 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors first:rounded-t-md last:rounded-b-md">부스 목록</a>
           </div>
         </div>
 
+        <!-- 장비 관리 -->
         <div class="relative dd">
-          <button onclick="toggleDd(this)" class="px-3 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors flex items-center gap-1">장비 관리 <span class="text-[10px] text-slate-400">▼</span></button>
-          <div class="dd-menu hidden absolute left-0 mt-1 w-44 bg-white border border-slate-200 rounded-lg shadow-lg py-1 z-40">
-            <button onclick="showView('placeholder')" class="w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50">장비 등록</button>
-            <button onclick="showView('placeholder')" class="w-full text-left px-4 py-2 text-sm text-slate-600 hover:bg-slate-50">장비 목록</button>
+          <button onclick="toggleDd('devices')" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors flex items-center gap-1">
+            장비 관리 <span class="text-xs text-slate-400" data-arrow="devices">▼</span>
+          </button>
+          <div data-menu="devices" hidden class="absolute top-full left-0 mt-1 bg-white border border-slate-200 rouded-md shadow-lg min-w-max z-50">
+            <a href="#" onclick="showView('dashboard');return false" class="block px-4 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors first:rounded-t-md last:rounded-b-md">장비 등록</a>
+            <a href="#" onclick="showView('dashboard');return false" class="block px-4 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors first:rounded-t-md last:rounded-b-md">장비 목록</a>
           </div>
         </div>
 
-        <button onclick="showView('placeholder')" class="px-3 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors">상담 관리</button>
-      </nav>
+        <!-- 상담 관리 -->
+        <div class="relative dd">
+          <button onclick="toggleDd('analytics')" class="px-4 py-2 text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors flex items-center gap-1">
+            상담 관리 <span class="text-xs text-slate-400" data-arrow="analytics">▼</span>
+          </button>
+          <div data-menu="analytics" hidden class="absolute top-full left-0 mt-1 bg-white border border-slate-200 rouded-md shadow-lg min-w-max z-50">
+            <a href="#" onclick="showView('dashboard');return false" class="block px-4 py-2 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors first:rounded-t-md last:rounded-b-md">통계 정보 조회</a>
+          </div>
+        </div>
+      </div>
 
-      <button onclick="logout()" class="px-3 py-2 text-sm font-medium text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors">로그아웃</button>
+      <div class="ml-auto pr-10">
+        <a href="#" onclick="logout();return false">
+          <button class="px-4 py-2 rext-sm font-medium text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors">로그아웃</button>
+        </a>
+      </div>
     </header>
 
     <main class="flex-1">
-
-      <!-- ===== 대시보드 ===== -->
+      <!-- 대시보드 ((admin)/test) -->
       <section id="view-dashboard" class="p-8">
         <div class="mb-6">
-          <h1 class="text-2xl font-semibold text-slate-800">대시보드</h1>
+          <h1 class="text-xl font-semibold text-slate-800">대시보드</h1>
           <p class="text-sm text-slate-500 mt-1">관리자 페이지 대시보드입니다.</p>
-        </div>
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-          <div class="bg-white rounded-xl border border-slate-200 p-5">
-            <p class="text-sm text-slate-500">총 기관 수</p>
-            <p class="text-3xl font-bold text-slate-800 mt-2">147</p>
-            <p class="text-xs text-emerald-600 mt-1">▲ 이번 달 +8</p>
-          </div>
-          <div class="bg-white rounded-xl border border-slate-200 p-5">
-            <p class="text-sm text-slate-500">운영 중 부스</p>
-            <p class="text-3xl font-bold text-slate-800 mt-2">213</p>
-            <p class="text-xs text-emerald-600 mt-1">▲ 이번 달 +12</p>
-          </div>
-          <div class="bg-white rounded-xl border border-slate-200 p-5">
-            <p class="text-sm text-slate-500">등록 장비</p>
-            <p class="text-3xl font-bold text-slate-800 mt-2">486</p>
-            <p class="text-xs text-slate-400 mt-1">PC · 모니터 · LTE</p>
-          </div>
-          <div class="bg-white rounded-xl border border-slate-200 p-5">
-            <p class="text-sm text-slate-500">이번 달 상담</p>
-            <p class="text-3xl font-bold text-slate-800 mt-2">1,024</p>
-            <p class="text-xs text-emerald-600 mt-1">▲ 전월 대비 +18%</p>
-          </div>
-        </div>
-        <div class="bg-white rounded-xl border border-slate-200 p-6">
-          <div class="flex items-center justify-between mb-5">
-            <h2 class="font-semibold text-slate-800">월별 상담 추이</h2>
-            <span class="text-xs text-slate-400">최근 8개월</span>
-          </div>
-          <div class="flex items-end gap-3 h-44" id="chart"></div>
         </div>
       </section>
 
-      <!-- ===== 기관 목록 ===== -->
-      <section id="view-orgs" hidden class="p-8">
+      <!-- 기관 목록 ((admin)/(org)/orglist) -->
+      <section id="view-orglist" hidden class="p-8">
         <div class="mb-6">
           <h1 class="text-2xl font-semibold text-slate-800">기관 목록</h1>
-          <p class="text-sm text-slate-500 mt-1">등록된 기관을 조회합니다.</p>
+          <p class="text-base text-slate-500 mt-1">등록된 기관을 조회합니다.</p>
         </div>
-        <div class="bg-white rounded-xl border border-slate-200">
-          <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100 flex-wrap gap-3">
+        <div class="bg-white rounded-lg border border-slate-200 shdow-sm">
+          <div class="flex items-center justify-between px-5 py-4 border-b border-slate-100">
             <div class="flex items-center gap-2 flex-wrap">
-              <input id="orgSearch" oninput="renderOrgs()" type="text" placeholder="기관명 또는 코드 검색" class="border border-slate-200 rounded-md px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 w-56" />
-              <select id="orgRegion" onchange="renderOrgs()" class="border border-slate-200 rounded-md px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
-              <select id="orgAccount" onchange="renderOrgs()" class="border border-slate-200 rounded-md px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <input type="text" id="oSearch" oninput="renderOrg()" placeholder="기관명 또는 코드 검색"
+                class="border border-slate-200 rounded-md px-3 py-2 text-base bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent w-56" />
+              <select id="oRegion" onchange="oPage=1;renderOrg()" class="border border-slate-200 rounded-md px-3 py-2 text-base bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
+              <select id="oAccount" onchange="oPage=1;renderOrg()" class="border border-slate-200 rounded-md px-3 py-2 text-base bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
                 <option value="">계정 유무</option>
                 <option value="true">계정 있음</option>
                 <option value="false">계정 없음</option>
               </select>
-              <button onclick="resetOrgs()" class="text-sm text-slate-400 hover:text-slate-600 underline underline-offset-2">초기화</button>
+              <button onclick="resetOrg()" class="text-base text-slate-400 hover:text-slate-600 underline underline-offset-2">초기화</button>
             </div>
+            <select id="oSize" onchange="oPage=1;renderOrg()" class="border border-slate-200 rounded-md px-3 py-2 text-base bg-white focus:outline-none">
+              <option value="10">10개씩</option>
+              <option value="20">20개씩</option>
+              <option value="50">50개씩</option>
+            </select>
           </div>
           <table class="w-full">
             <thead>
               <tr class="bg-slate-50 border-b border-slate-200">
-                <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500">기관 코드</th>
-                <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500">기관명</th>
-                <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500">등록 일자</th>
-                <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500">운영 부스</th>
-                <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500">계정</th>
-                <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500">지역</th>
+                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">기관 코드</th>
+                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">기관명</th>
+                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500 cursor-pointer select-none hover:text-slate-700" onclick="oToggleSort()" id="oSortTh">둥록 일자 ▼</th>
+                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">운영 부스</th>
+                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">계정</th>
+                <th class="text-left px-5 py-3 text-sm font-semibold text-slate-500">지역</th>
               </tr>
             </thead>
-            <tbody id="orgBody" class="divide-y divide-slate-100"></tbody>
+            <tbody id="oBody" class="divide-y divide-slate-100"></tbody>
           </table>
-          <div class="px-5 py-3 border-t border-slate-100">
-            <p id="orgCount" class="text-xs text-slate-400"></p>
+          <div class="flex items-center justify-between px-5 py-3 border-t bordere-slate-100">
+            <p id="oCount" class="text-sm text-slate-400"></p>
+            <div id="oPager" class="flex items-center gap-1"></div>
           </div>
         </div>
       </section>
 
-      <!-- ===== 부스 목록 ===== -->
-      <section id="view-booths" hidden class="p-8">
-        <div class="mb-6">
-          <h1 class="text-2xl font-semibold text-slate-800">부스 목록</h1>
-          <p class="text-sm text-slate-500 mt-1">설치된 상담 부스를 조회합니다.</p>
-        </div>
-        <div class="bg-white rounded-xl border border-slate-200">
-          <table class="w-full">
-            <thead>
-              <tr class="bg-slate-50 border-b border-slate-200">
-                <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500">부스 코드</th>
-                <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500">소속 기관</th>
-                <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500">설치 위치</th>
-                <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500">설치일</th>
-                <th class="text-left px-5 py-3 text-xs font-semibold text-slate-500">상태</th>
-              </tr>
-            </thead>
-            <tbody id="boothBody" class="divide-y divide-slate-100"></tbody>
-          </table>
+      <!-- 부스 목록 ((admin)/(booth)/boothlist) -->
+      <section id="view-boothlist" hidden>
+        <div class="min-h-screen bg-stone-50">
+          <div class="max-w-300 mx-auto">
+            <div class="flex items-center justify-between mx-auto pt-10 pb-4">
+              <div class="flex items-center gap-2">
+                <input type="text" id="bSearch" oninput="renderBooth()" placeholder="검색어 입력" class="border rounded-sm py-1 px-2 mx-2 bg-white" />
+                <select id="bStatus" onchange="bPage=1;renderBooth()" class="border-2 rounded-sm py-1 px-2 mx-2 bg-white hover:bg-gray-100">
+                  <option value="">전체 상태</option>
+                  <option value="운영 중">운영 중</option>
+                  <option value="미운영">미운영</option>
+                  <option value="서비스 중단">서비스 중단</option>
+                </select>
+                <select id="bDevice" onchange="bPage=1;renderBooth()" class="border-2 rounded-sm py-1 px-2 mx-2 bg-white hover:bg-gray-100">
+                  <option value="">미할당 장비 선택</option>
+                  <option value="pc">미니 PC</option>
+                  <option value="monitor">모니터</option>
+                  <option value="lte">LTE 라우터</option>
+                </select>
+                <span onclick="resetBooth()" class="text-gray-500 border-gray-500 border-b border-dashed cursor-pointer">초기화</span>
+              </div>
+              <div class="flex items-center ml-auto bg-white hover:bg-gray-100">
+                <select id="bSize" onchange="bPage=1;renderBooth()" class="border-2 px-1 py-1">
+                  <option value="10">10개</option>
+                  <option value="20">20개</option>
+                  <option value="50">50개</option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <table class="w-full mx-auto border-b">
+                <thead>
+                  <tr>
+                    <th class="text-left px-4 py-2 border-b">부스 코드</th>
+                    <th class="text-left px-4 py-2 border-b">소속 기관명</th>
+                    <th class="text-left px-4 py-2 border-b">부스 설치 위치</th>
+                    <th class="text-left px-4 py-2 border-b">장비 할당 여부</th>
+                    <th class="text-left px-4 py-2 border-b cursor-pointer" onclick="bToggleSort()" id="bSortTh">부스 설치 일자 ▼</th>
+                    <th class="text-left px-4 py-2 border-b">부스 상태</th>
+                  </tr>
+                </thead>
+                <tbody id="bBody"></tbody>
+              </table>
+            </div>
+            <div id="bPager" class="flex m-4 justify-center items-center gap-4"></div>
+          </div>
         </div>
       </section>
-
-      <!-- ===== 미구현 안내 ===== -->
-      <section id="view-placeholder" hidden class="p-8">
-        <div class="bg-white rounded-xl border border-slate-200 p-12 text-center">
-          <div class="mx-auto mb-4 w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 text-xl">🛠️</div>
-          <h2 class="font-semibold text-slate-700">이 페이지는 데모에 포함되지 않았습니다</h2>
-          <p class="text-sm text-slate-400 mt-1.5">대시보드 · 기관 목록 · 부스 목록을 둘러보세요.</p>
-          <button onclick="showView('dashboard')" class="mt-5 px-4 py-2 text-sm font-medium bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors">대시보드로</button>
-        </div>
-      </section>
-
     </main>
   </div>
 
   <script>
-    // ---------- 화면 전환 ----------
-    function enterApp(e) {
-      e.preventDefault()
-      document.getElementById('login').hidden = true
-      document.getElementById('app').hidden = false
-      showView('dashboard')
-    }
-    function logout() {
-      document.getElementById('app').hidden = true
-      document.getElementById('login').hidden = false
-      closeAllDd()
-    }
-    function showView(name) {
-      ['dashboard', 'orgs', 'booths', 'placeholder'].forEach((v) => {
-        document.getElementById('view-' + v).hidden = v !== name
-      })
-      document.querySelectorAll('.nav-btn').forEach((b) => {
-        const active = b.dataset.nav === name
-        b.classList.toggle('bg-slate-100', active)
-        b.classList.toggle('text-slate-900', active)
-      })
-      closeAllDd()
-      window.scrollTo(0, 0)
-    }
-
-    // ---------- 드롭다운 ----------
-    function toggleDd(btn) {
-      const menu = btn.nextElementSibling
-      const isOpen = !menu.classList.contains('hidden')
-      closeAllDd()
-      if (!isOpen) menu.classList.remove('hidden')
-    }
-    function closeAllDd() {
-      document.querySelectorAll('.dd-menu').forEach((m) => m.classList.add('hidden'))
-    }
-    document.addEventListener('click', (e) => {
-      if (!e.target.closest('.dd')) closeAllDd()
-    })
-
-    // ---------- 차트 ----------
-    const chartData = [620, 710, 680, 805, 760, 890, 940, 1024]
-    const chartMax = Math.max(...chartData)
-    document.getElementById('chart').innerHTML = chartData.map((v, i) => `
-      <div class="flex-1 flex flex-col items-center gap-2">
-        <div class="w-full bg-blue-500/85 hover:bg-blue-500 rounded-t-md transition-all" style="height:${(v / chartMax) * 100}%" title="${v}건"></div>
-        <span class="text-[11px] text-slate-400">${i + 1}월</span>
-      </div>`).join('')
-
-    // ---------- 데이터 ----------
-    const orgs = [
+    // ---------- 데이터 (datas.ts 일부) ----------
+    const institutions = [
       { code: '1042-8731-5290-3618', name: '서울마음지원센터', region: '서울', createdAt: '2026-03-01', booths: 1, account: true },
       { code: '2917-4053-8164-7325', name: '늘봄중학교', region: '경기', createdAt: '2026-03-03', booths: 2, account: true },
       { code: '3784-6290-1537-4862', name: '한빛청소년복지관', region: '인천', createdAt: '2026-02-14', booths: 1, account: true },
@@ -274,71 +242,100 @@
       { code: '6179-8024-3597-4163', name: '희망나눔협회', region: '경기', createdAt: '2025-05-11', booths: 1, account: true },
     ]
     const booths = [
-      { code: '3821-0174-6593-2047', org: '서울마음지원센터', loc: '1층 복도 끝 대기공간', date: '2024-03-15', status: '운영 중' },
-      { code: '1492-8830-2761-5038', org: '늘봄중학교', loc: '본관 3층 위클래스', date: '2023-09-01', status: '운영 중' },
-      { code: '7263-4150-9882-3614', org: '한빛청소년복지관', loc: '정문 옆 안내데스크', date: '2025-02-20', status: '운영 중' },
-      { code: '9183-6702-3859-0241', org: '다온심리상담센터', loc: '지하 1층 엘리베이터 옆', date: '2023-06-14', status: '미운영' },
-      { code: '0391-5618-7204-8853', org: '마포구립노인종합복지관', loc: '후문 행정동 앞', date: '2023-12-03', status: '서비스 중단' },
-      { code: '2574-1063-8427-4915', org: '강남구청소년상담복지센터', loc: '로비 우측 안내부스', date: '2025-01-08', status: '운영 중' },
-      { code: '4762-0935-2148-6307', org: '은평천사원', loc: '1층 원무과 입구', date: '2026-03-01', status: '미운영' },
-      { code: '8215-3476-9061-0594', org: '나눔복지재단', loc: '3층 프로그램실 앞', date: '2024-05-18', status: '운영 중' },
+      { code: '3821-0174-6593-2047', org: '서울마음지원센터', location: '1층 복도 끝 대기공간', pc: 'P-047', monitor: 'M-023', lte: '미할당', installedAt: '2024-03-15', status: '운영 중' },
+      { code: '1492-8830-2761-5038', org: '늘봄중학교', location: '본관 3층 위클래스', pc: 'P-012', monitor: 'M-041', lte: '미할당', installedAt: '2023-09-01', status: '운영 중' },
+      { code: '7263-4150-9882-3614', org: '한빛청소년복지관', location: '정문 옆 안내데스크', pc: 'P-088', monitor: 'M-005', lte: '미할당', installedAt: '2025-02-20', status: '운영 중' },
+      { code: '5047-2391-1480-7726', org: '푸른나무재단', location: '2층 상담실 앞 복도', pc: 'P-033', monitor: 'M-067', lte: '미할당', installedAt: '2024-11-07', status: '운영 중' },
+      { code: '9183-6702-3859-0241', org: '다온심리상담센터', location: '지하 1층 엘리베이터 옆', pc: 'P-061', monitor: 'M-089', lte: '미할당', installedAt: '2023-06-14', status: '미운영' },
+      { code: '2574-1063-8427-4915', org: '강남구청소년상담복지센터', location: '로비 우측 안내부스', pc: 'P-019', monitor: 'M-034', lte: 'L-003', installedAt: '2025-01-08', status: '운영 중' },
+      { code: '0391-5618-7204-8853', org: '마포구립노인종합복지관', location: '후문 행정동 앞', pc: 'P-042', monitor: 'M-056', lte: '미할당', installedAt: '2023-12-03', status: '서비스 중단' },
+      { code: '4762-0935-2148-6307', org: '은평천사원', location: '1층 원무과 입구', pc: '미할당', monitor: 'M-078', lte: '미할당', installedAt: '2026-03-01', status: '미운영' },
     ]
+    const regions = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '강원', '경기', '경남', '경북', '전남', '전북', '충남', '충북', '제주']
 
-    // 지역 셀렉트 채우기
-    const regions = [...new Set(orgs.map((o) => o.region))]
-    document.getElementById('orgRegion').innerHTML =
-      '<option value="">전체 지역</option>' + regions.map((r) => `<option value="${r}">${r}</option>`).join('')
+    // ---------- 화면/드롭다운 ----------
+    function enterApp(e) { e.preventDefault(); document.getElementById('login').hidden = true; document.getElementById('app').hidden = false; showView('dashboard') }
+    function logout() { document.getElementById('app').hidden = true; document.getElementById('login').hidden = false; closeDd() }
+    function showView(name) {
+      ['dashboard', 'orglist', 'boothlist'].forEach((v) => { document.getElementById('view-' + v).hidden = v !== name })
+      closeDd(); window.scrollTo(0, 0)
+      if (name === 'orglist') renderOrg()
+      if (name === 'boothlist') renderBooth()
+    }
+    let openMenu = null
+    function toggleDd(key) {
+      openMenu = openMenu === key ? null : key
+      document.querySelectorAll('[data-menu]').forEach((m) => { m.hidden = m.dataset.menu !== openMenu })
+      document.querySelectorAll('[data-arrow]').forEach((a) => { a.textContent = a.dataset.arrow === openMenu ? '▲' : '▼' })
+    }
+    function closeDd() { openMenu = null; document.querySelectorAll('[data-menu]').forEach((m) => (m.hidden = true)); document.querySelectorAll('[data-arrow]').forEach((a) => (a.textContent = '▼')) }
+    document.addEventListener('click', (e) => { if (!e.target.closest('.dd')) closeDd() })
 
-    // ---------- 기관 목록 렌더 ----------
-    function renderOrgs() {
-      const q = document.getElementById('orgSearch').value.trim()
-      const region = document.getElementById('orgRegion').value
-      const account = document.getElementById('orgAccount').value
-      const rows = orgs.filter((o) => {
-        if (region && o.region !== region) return false
-        if (account && String(o.account) !== account) return false
-        if (q && !o.name.includes(q) && !o.code.includes(q)) return false
+    // ---------- 기관 목록 ----------
+    let oSort = 'desc', oPage = 1
+    document.getElementById('oRegion').innerHTML = '<option value="">전체 지역</option>' + regions.map((r) => `<option value="${r}">${r}</option>`).join('')
+    function oToggleSort() { oSort = oSort === 'desc' ? 'asc' : 'desc'; document.getElementById('oSortTh').textContent = '둥록 일자 ' + (oSort === 'desc' ? '▼' : '▲'); renderOrg() }
+    function resetOrg() { oSearch.value = ''; oRegion.value = ''; oAccount.value = ''; oSize.value = '10'; oPage = 1; renderOrg() }
+    function renderOrg() {
+      const q = oSearch.value.trim(), region = oRegion.value, account = oAccount.value, size = +oSize.value
+      let rows = institutions.filter((i) => {
+        if (region && i.region !== region) return false
+        if (account && String(i.account) !== account) return false
+        if (q && !i.code.includes(q) && !i.name.includes(q)) return false
         return true
       })
-      document.getElementById('orgBody').innerHTML = rows.length
-        ? rows.map((o) => `
-          <tr class="hover:bg-slate-50 cursor-pointer transition-colors">
-            <td class="px-5 py-3.5 text-sm font-mono text-slate-600">${o.code}</td>
-            <td class="px-5 py-3.5 text-sm text-slate-700">${o.name}</td>
-            <td class="px-5 py-3.5 text-sm text-slate-500">${o.createdAt}</td>
-            <td class="px-5 py-3.5 text-sm text-slate-600">${o.booths}개</td>
-            <td class="px-5 py-3.5 text-sm">
-              <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${o.account ? 'bg-green-50 text-green-700' : 'bg-slate-100 text-slate-500'}">${o.account ? '있음' : '없음'}</span>
-            </td>
-            <td class="px-5 py-3.5 text-sm text-slate-600">${o.region}</td>
-          </tr>`).join('')
-        : `<tr><td colspan="6" class="px-5 py-10 text-center text-sm text-slate-400">검색 결과가 없습니다.</td></tr>`
-      document.getElementById('orgCount').textContent = `전체 ${orgs.length}개 중 ${rows.length}개 표시`
+      rows.sort((a, b) => oSort === 'asc' ? new Date(a.createdAt) - new Date(b.createdAt) : new Date(b.createdAt) - new Date(a.createdAt))
+      const total = rows.length, totalPage = Math.max(1, Math.ceil(total / size))
+      if (oPage > totalPage) oPage = totalPage
+      const start = (oPage - 1) * size, pageData = rows.slice(start, start + size)
+      document.getElementById('oBody').innerHTML = pageData.map((i) => `
+        <tr class="hover:bg-slate-50 cursor-pointer transition-colors">
+          <td class="px-5 py-4 text-base font-mono text-slate-600">${i.code}</td>
+          <td class="px-5 py-4 text-base font-mono text-slate-600">${i.name}</td>
+          <td class="px-5 py-4 text-base font-mono text-slate-600">${i.createdAt}</td>
+          <td class="px-5 py-4 text-base font-mono text-slate-600">${i.booths}개</td>
+          <td class="px-5 py-4 text-base"><span class="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-medium ${i.account ? 'bg-green-50 text-green-700' : 'bg-slate-100 text-slate-500'}">${i.account ? '있음' : '없음'}</span></td>
+          <td class="px-5 py-4 text-base font-mono text-slate-600">${i.region}</td>
+        </tr>`).join('')
+      document.getElementById('oCount').textContent = `${total}개 중 ${total ? start + 1 : 0}-${Math.min(start + size, total)}`
+      let pager = `<button onclick="oPage=1;renderOrg()" class="px-2 py-1 text-base text-slate-600 hover:text-slate-800 ${oPage === 1 ? 'opacity-30' : ''}">${'<<'}</button>`
+      for (let n = 1; n <= totalPage; n++) pager += `<button onclick="oPage=${n};renderOrg()" class="px-3 py-1 text-base rounded-md transition-colors ${oPage === n ? 'bg-blue-500 text-white font-medium' : 'hover:bg-slate-100 text-slate-600'}">${n}</button>`
+      pager += `<button onclick="oPage=${totalPage};renderOrg()" class="px-2 py-1 text-base text-slate-600 hover:text-slate-800 ${oPage === totalPage ? 'opacity-30' : ''}">${'>>'}</button>`
+      document.getElementById('oPager').innerHTML = pager
     }
-    function resetOrgs() {
-      document.getElementById('orgSearch').value = ''
-      document.getElementById('orgRegion').value = ''
-      document.getElementById('orgAccount').value = ''
-      renderOrgs()
-    }
-    renderOrgs()
 
-    // ---------- 부스 목록 렌더 ----------
-    const statusStyle = {
-      '운영 중': 'bg-green-50 text-green-700',
-      '미운영': 'bg-amber-50 text-amber-700',
-      '서비스 중단': 'bg-red-50 text-red-600',
+    // ---------- 부스 목록 ----------
+    let bSort = 'desc', bPage = 1
+    function bToggleSort() { bSort = bSort === 'desc' ? 'asc' : 'desc'; document.getElementById('bSortTh').textContent = '부스 설치 일자 ' + (bSort === 'desc' ? '▼' : '▲'); renderBooth() }
+    function resetBooth() { bSearch.value = ''; bStatus.value = ''; bDevice.value = ''; bSize.value = '10'; bPage = 1; renderBooth() }
+    function renderBooth() {
+      const q = bSearch.value.trim(), status = bStatus.value, dev = bDevice.value, size = +bSize.value
+      let rows = booths.filter((i) => {
+        if (status && i.status !== status) return false
+        if (dev === 'pc' && i.pc !== '미할당') return false
+        if (dev === 'monitor' && i.monitor !== '미할당') return false
+        if (dev === 'lte' && i.lte !== '미할당') return false
+        if (q && !i.code.includes(q) && !i.org.includes(q)) return false
+        return true
+      })
+      rows.sort((a, b) => bSort === 'asc' ? new Date(a.installedAt) - new Date(b.installedAt) : new Date(b.installedAt) - new Date(a.installedAt))
+      const total = rows.length, totalPage = Math.max(1, Math.ceil(total / size))
+      if (bPage > totalPage) bPage = totalPage
+      const start = (bPage - 1) * size, pageData = rows.slice(start, start + size)
+      document.getElementById('bBody').innerHTML = pageData.map((i) => `
+        <tr class="cursor-pointer hover:bg-stone-200">
+          <td class="px-4 py-3 border-b border-dashed">${i.code}</td>
+          <td class="px-4 py-3 border-b border-dashed">${i.org}</td>
+          <td class="px-4 py-3 border-b border-dashed">${i.location}</td>
+          <td class="px-4 py-3 border-b border-dashed">${i.pc !== '미할당' ? 'P : O' : 'P : X'} | ${i.monitor !== '미할당' ? ' M : O' : ' M : X'} | ${i.lte !== '미할당' ? ' L : O' : ' L : X'}</td>
+          <td class="px-4 py-3 border-b border-dashed">${i.installedAt}</td>
+          <td class="px-4 py-2 border-b border-dashed">${i.status}</td>
+        </tr>`).join('')
+      let pager = `<button onclick="bPage=1;renderBooth()">${'<<'}</button>`
+      for (let n = 1; n <= totalPage; n++) pager += `<button onclick="bPage=${n};renderBooth()" class="${bPage === n ? 'font-bold px-3 py-1' : 'px-3 py-1'}">${n}</button>`
+      pager += `<button onclick="bPage=${totalPage};renderBooth()">${'>>'}</button>`
+      document.getElementById('bPager').innerHTML = pager
     }
-    document.getElementById('boothBody').innerHTML = booths.map((b) => `
-      <tr class="hover:bg-slate-50 cursor-pointer transition-colors">
-        <td class="px-5 py-3.5 text-sm font-mono text-slate-600">${b.code}</td>
-        <td class="px-5 py-3.5 text-sm text-slate-700">${b.org}</td>
-        <td class="px-5 py-3.5 text-sm text-slate-500">${b.loc}</td>
-        <td class="px-5 py-3.5 text-sm text-slate-500">${b.date}</td>
-        <td class="px-5 py-3.5 text-sm">
-          <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${statusStyle[b.status]}">${b.status}</span>
-        </td>
-      </tr>`).join('')
   </script>
 </body>
 </html>
