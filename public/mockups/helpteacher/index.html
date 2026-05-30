@@ -602,5 +602,41 @@
 
     renderDash()
   </script>
+
+  <!-- ===== 제작 설명(주석) ===== -->
+  <style>
+    .anno-toggle{position:fixed;bottom:16px;left:16px;z-index:10000;background:#3b82f6;color:#fff;border:none;font-size:12px;font-weight:600;padding:9px 14px;border-radius:999px;box-shadow:0 4px 12px rgba(0,0,0,.2);cursor:pointer;font-family:inherit}
+    .anno-toggle.on{background:#1e3a8a}
+    body.anno-on [data-explain]{outline:2px dashed #3b82f6;outline-offset:3px;border-radius:6px;cursor:help}
+    .anno-tip{position:fixed;z-index:10001;max-width:280px;background:#0f172a;color:#fff;font-size:12px;line-height:1.55;padding:10px 12px;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.25);pointer-events:none;opacity:0;transition:opacity .12s;font-family:inherit}
+    .anno-tip.show{opacity:1}
+    .anno-tip b{display:block;font-size:12.5px;margin-bottom:3px;color:#7fb0ff}
+  </style>
+  <script>
+    (function () {
+      var ANN = [
+        ['#app > header > nav', 'Next.js 15 · App Router', 'Next.js 15 (App Router) · React 19 · TypeScript · Tailwind v4 / 라우트 그룹으로 도메인별 페이지 분리'],
+        ['#dashCards', '인증 · API 병렬 호출', 'httpOnly 쿠키로 access token 관리 / Promise.all로 다중 API 동시 호출 후 집계'],
+        ['#dashPanels', 'BFF 아키텍처', 'Next.js Route Handler를 BFF로 두고 쿠키의 토큰을 꺼내 Bearer 인증으로 백엔드에 중계'],
+        ['#chTrend', '데이터 시각화', 'recharts — 세션 추이 / 성별·연령 / 심리점수 분포 / 지역별 고민 차트 (데모는 Chart.js로 재현)'],
+        ['#view-org .bg-white, #view-booth .bg-white', '서버사이드 목록 처리', 'URLSearchParams 기반 검색 · 필터 · 정렬 · 페이지네이션을 서버 파라미터로 위임'],
+      ];
+      var tip = document.createElement('div'); tip.className = 'anno-tip'; document.body.appendChild(tip);
+      var on = false;
+      var btn = document.createElement('button'); btn.className = 'anno-toggle'; btn.textContent = '💡 어떻게 만들었나'; document.body.appendChild(btn);
+      btn.onclick = function () {
+        on = !on; document.body.classList.toggle('anno-on', on); btn.classList.toggle('on', on);
+        btn.textContent = on ? '✕ 설명 끄기' : '💡 어떻게 만들었나';
+        if (!on) tip.classList.remove('show');
+      };
+      function bind(el, a) {
+        el.setAttribute('data-explain', '');
+        el.addEventListener('mouseenter', function () { if (!on) return; tip.innerHTML = '<b>' + a[1] + '</b>' + a[2]; tip.classList.add('show'); });
+        el.addEventListener('mousemove', function (e) { if (!on) return; var p = 14, x = e.clientX + p, y = e.clientY + p, r = tip.getBoundingClientRect(); if (x + r.width > innerWidth) x = e.clientX - r.width - p; if (y + r.height > innerHeight) y = e.clientY - r.height - p; tip.style.left = x + 'px'; tip.style.top = y + 'px'; });
+        el.addEventListener('mouseleave', function () { tip.classList.remove('show'); });
+      }
+      ANN.forEach(function (a) { document.querySelectorAll(a[0]).forEach(function (el) { bind(el, a); }); });
+    })();
+  </script>
 </body>
 </html>

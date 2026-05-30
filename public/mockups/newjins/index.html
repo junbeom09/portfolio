@@ -329,5 +329,59 @@
       </div>
     </footer>
   </div>
+
+  <!-- ===== 제작 설명(주석) 프로토타입 ===== -->
+  <style>
+    .anno-toggle{position:fixed;bottom:16px;left:16px;z-index:10000;background:#1f6feb;color:#fff;border:none;font-size:12px;font-weight:600;padding:9px 14px;border-radius:999px;box-shadow:0 4px 12px rgba(0,0,0,.2);cursor:pointer;font-family:inherit}
+    .anno-toggle.on{background:#0b1f3a}
+    body.anno-on [data-explain]{outline:2px dashed #1f6feb;outline-offset:3px;border-radius:4px;cursor:help}
+    .anno-tip{position:fixed;z-index:10001;max-width:260px;background:#0b1f3a;color:#fff;font-size:12px;line-height:1.55;padding:10px 12px;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.25);pointer-events:none;opacity:0;transition:opacity .12s;font-family:inherit}
+    .anno-tip.show{opacity:1}
+    .anno-tip b{display:block;font-size:12.5px;margin-bottom:3px;color:#7fb0ff}
+  </style>
+  <script>
+    (function () {
+      var ANN = [
+        ['.list_newsissue', '크롤링 · 요약 · 가짜뉴스 판별', 'Python · Selenium · BeautifulSoup · schedule (정기 크롤링) / KoBART (본문 요약) / 파인튜닝 BERT 분류 (가짜뉴스 판별) / MySQL 적재'],
+        ['.content-article .box_g:not(.box_news_issue)', '유사 기사 군집화', 'KoBERT 문장 임베딩 → DBSCAN (cosine) 군집화로 중복 기사 제거 · 대표 기사 추출'],
+        ['.box_photonews', '챗봇 연동', '카카오톡 채널 챗봇 API 연동 (뉴스레터 발송)'],
+        ['.srch-group', '백엔드', 'Spring Boot · MyBatis · MySQL — 검색 / 언론사 구독 REST API'],
+      ];
+      var tip = document.createElement('div');
+      tip.className = 'anno-tip';
+      document.body.appendChild(tip);
+      var on = false;
+      var btn = document.createElement('button');
+      btn.className = 'anno-toggle';
+      btn.textContent = '💡 어떻게 만들었나';
+      document.body.appendChild(btn);
+      btn.onclick = function () {
+        on = !on;
+        document.body.classList.toggle('anno-on', on);
+        btn.classList.toggle('on', on);
+        btn.textContent = on ? '✕ 설명 끄기' : '💡 어떻게 만들었나';
+        if (!on) tip.classList.remove('show');
+      };
+      ANN.forEach(function (a) {
+        document.querySelectorAll(a[0]).forEach(function (el) {
+          el.setAttribute('data-explain', '');
+          el.addEventListener('mouseenter', function () {
+            if (!on) return;
+            tip.innerHTML = '<b>' + a[1] + '</b>' + a[2];
+            tip.classList.add('show');
+          });
+          el.addEventListener('mousemove', function (e) {
+            if (!on) return;
+            var p = 14, x = e.clientX + p, y = e.clientY + p, r = tip.getBoundingClientRect();
+            if (x + r.width > innerWidth) x = e.clientX - r.width - p;
+            if (y + r.height > innerHeight) y = e.clientY - r.height - p;
+            tip.style.left = x + 'px';
+            tip.style.top = y + 'px';
+          });
+          el.addEventListener('mouseleave', function () { tip.classList.remove('show'); });
+        });
+      });
+    })();
+  </script>
 </body>
 </html>

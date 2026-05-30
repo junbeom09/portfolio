@@ -386,5 +386,31 @@ a:-webkit-any-link {
 		integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
 		crossorigin="anonymous"></script>
 	<script src="js/webflow.js" type="text/javascript"></script>
+
+  <style>
+    .anno-toggle{position:fixed;bottom:20px;left:20px;z-index:10000;background:#FC4100;color:#fff;border:none;font-size:18px;font-weight:600;padding:14px 22px;border-radius:999px;box-shadow:0 4px 14px rgba(0,0,0,.25);cursor:pointer;font-family:inherit}
+    .anno-toggle.on{background:#7a1f00}
+    body.anno-on [data-explain]{outline:3px dashed #FC4100;outline-offset:4px;border-radius:8px;cursor:help}
+    .anno-tip{position:fixed;z-index:10001;max-width:360px;background:#1a1a1a;color:#fff;font-size:16px;line-height:1.55;padding:14px 16px;border-radius:10px;box-shadow:0 6px 22px rgba(0,0,0,.3);pointer-events:none;opacity:0;transition:opacity .12s;font-family:inherit}
+    .anno-tip.show{opacity:1}
+    .anno-tip b{display:block;font-size:16px;margin-bottom:4px;color:#FFB59B}
+  </style>
+  <script>
+    (function () {
+      var ANN = [[".filter-accordion-wrap","조건 검색","Servlet에서 다중 카테고리 파라미터를 받아 MyBatis 동적 SQL(if·foreach)로 필터링"],[".art-item","DB 바인딩","JSP EL/JSTL로 Oracle DB 작가 목록(프로필·가격대 min~max)을 반복 렌더링"],[".art-grid","DB 조회","Oracle · MyBatis 매퍼로 작가 리스트 조회"]];
+      var tip = document.createElement('div'); tip.className='anno-tip'; document.body.appendChild(tip);
+      var on=false;
+      var btn=document.createElement('button'); btn.className='anno-toggle'; btn.textContent='💡 어떻게 만들었나'; document.body.appendChild(btn);
+      btn.onclick=function(){ on=!on; document.body.classList.toggle('anno-on',on); btn.classList.toggle('on',on); btn.textContent=on?'✕ 설명 끄기':'💡 어떻게 만들었나'; if(!on) tip.classList.remove('show'); };
+      function bind(el,a){
+        el.setAttribute('data-explain','');
+        el.addEventListener('mouseenter',function(){ if(!on)return; tip.innerHTML='<b>'+a[1]+'</b>'+a[2]; tip.classList.add('show'); });
+        el.addEventListener('mousemove',function(e){ if(!on)return; var p=16,x=e.clientX+p,y=e.clientY+p,r=tip.getBoundingClientRect(); if(x+r.width>innerWidth)x=e.clientX-r.width-p; if(y+r.height>innerHeight)y=e.clientY-r.height-p; tip.style.left=x+'px'; tip.style.top=y+'px'; });
+        el.addEventListener('mouseleave',function(){ tip.classList.remove('show'); });
+      }
+      ANN.forEach(function(a){ document.querySelectorAll(a[0]).forEach(function(el){ bind(el,a); }); });
+    })();
+  </script>
+
 </body>
 </html>
