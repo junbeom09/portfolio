@@ -73,6 +73,20 @@ function TechIcon({ tech, delay, inView, active, onActivate }) {
           loading="lazy"
         />
       </div>
+
+      {/* 데스크톱 전용 말풍선 (hover) */}
+      <div
+        className={`hidden md:block absolute left-1/2 -translate-x-1/2 bottom-full mb-3 w-[210px] z-30 transition-all duration-200 pointer-events-none ${active ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'}`}
+      >
+        <div
+          className="rounded-lg px-3 py-2 text-white shadow-lg text-center"
+          style={{ backgroundColor: tech.color === '#000000' ? '#1a1a1a' : tech.color }}
+        >
+          <p className="text-xs font-bold leading-tight" style={tech.color === '#F7DF1E' ? { color: '#1a1a1a' } : undefined}>{tech.name}</p>
+          <p className="text-[11px] leading-snug mt-0.5 opacity-90" style={tech.color === '#F7DF1E' ? { color: '#1a1a1a' } : undefined}>{tech.desc}</p>
+        </div>
+        <div className="w-2 h-2 rotate-45 mx-auto -mt-1" style={{ backgroundColor: tech.color === '#000000' ? '#1a1a1a' : tech.color }} />
+      </div>
     </motion.div>
   )
 }
@@ -137,8 +151,8 @@ export default function About() {
               ))}
             </div>
 
-            {/* 활성 아이콘 설명 (행 아래 고정 영역 — 화면 밖으로 안 나감) */}
-            <div className="mt-5 min-h-[3rem] flex items-center justify-center text-center">
+            {/* 모바일 전용: 탭한 아이콘 설명을 행 아래 고정 영역에 (말풍선은 데스크톱에서) */}
+            <div className="md:hidden mt-5 min-h-[3rem] flex items-center justify-center text-center">
               {activeTech ? (() => {
                 const t = techStack.find((x) => x.name === activeTech)
                 return (
@@ -153,7 +167,7 @@ export default function About() {
                   </motion.p>
                 )
               })() : (
-                <p className="text-xs text-black/25 dark:text-white/25">아이콘에 마우스를 올리거나 탭하면 설명이 나와요</p>
+                <p className="text-xs text-black/25 dark:text-white/25">아이콘을 탭하면 설명이 나와요</p>
               )}
             </div>
           </BentoCard>
