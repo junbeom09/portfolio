@@ -62,6 +62,8 @@ function ProjectRow({ project, index, inView }) {
 
   const Text = (
     <div className={`flex flex-col justify-center ${left ? 'md:items-start md:text-left' : 'md:items-end md:text-right'}`}>
+      {/* 모바일에서만 연도 표시 (데스크톱은 타임라인 노드에) */}
+      <span className="md:hidden font-mono text-xs text-black/30 dark:text-white/30 mb-2">{project.year}</span>
       <h3 className="font-black text-black dark:text-white text-2xl md:text-3xl tracking-tight mb-3 leading-tight">
         {project.title}
       </h3>
@@ -100,22 +102,22 @@ function ProjectRow({ project, index, inView }) {
     </div>
   )
 
-  // 이미지: 카드 없이 반투명 + 텍스트 쪽으로 페이드되는 그라데이션 마스크
+  // 이미지: 카드 없이 반투명. 데스크톱은 텍스트 쪽으로 페이드, 모바일은 마스크 없이 통째로.
   const fadeDir = left ? 'to left' : 'to right' // 텍스트(가운데)쪽으로 사라지게
+  const mask = `linear-gradient(${fadeDir}, transparent 0%, rgba(0,0,0,0.3) 14%, #000 45%)`
   const Image = (
     <div
       onClick={open}
       className={`group/img relative w-full ${clickable ? 'cursor-pointer' : ''}`}
+      style={{ '--mask': mask }}
     >
       <img
         src={project.thumb}
         alt={project.title}
         loading="lazy"
-        className="w-full h-auto object-contain rounded-xl opacity-65 group-hover/img:opacity-90 transition-all duration-500 group-hover/img:scale-[1.03]"
+        className="w-full h-auto object-contain rounded-xl opacity-65 group-hover/img:opacity-90 transition-all duration-500 group-hover/img:scale-[1.03] [-webkit-mask-image:none] [mask-image:none] md:[-webkit-mask-image:var(--mask)] md:[mask-image:var(--mask)]"
         style={{
           filter: project.lightenThumb ? 'brightness(1.7) saturate(0.9)' : undefined,
-          WebkitMaskImage: `linear-gradient(${fadeDir}, transparent 0%, rgba(0,0,0,0.3) 14%, #000 45%)`,
-          maskImage: `linear-gradient(${fadeDir}, transparent 0%, rgba(0,0,0,0.3) 14%, #000 45%)`,
         }}
       />
     </div>
@@ -134,17 +136,10 @@ function ProjectRow({ project, index, inView }) {
         <span className="mt-2 font-mono text-[11px] text-black/35 dark:text-white/35 whitespace-nowrap">{project.year}</span>
       </div>
 
-      {left ? (
-        <>
-          {Text}
-          {Image}
-        </>
-      ) : (
-        <>
-          <div className="md:order-1 order-2">{Image}</div>
-          <div className="md:order-2 order-1">{Text}</div>
-        </>
-      )}
+      {/* 모바일: 항상 이미지 위 → 텍스트 아래로 통일.
+          데스크톱(md+): 지그재그 — left면 텍스트가 왼쪽(먼저), right면 이미지가 왼쪽(먼저) */}
+      <div className={`order-1 ${left ? 'md:order-2' : 'md:order-1'}`}>{Image}</div>
+      <div className={`order-2 ${left ? 'md:order-1' : 'md:order-2'}`}>{Text}</div>
     </motion.div>
   )
 }

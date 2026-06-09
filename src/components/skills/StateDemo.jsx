@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ShoppingCart, Plus, Minus, X } from 'lucide-react'
+import { ShoppingCart, Plus, Minus, X, Check } from 'lucide-react'
 
 const catalog = [
   { id: 1, name: 'Product A', price: 29000, emoji: '🎧' },
@@ -12,6 +12,16 @@ const catalog = [
 export default function StateDemo() {
   const [cart, setCart] = useState([])
   const [cartOpen, setCartOpen] = useState(false)
+  const [ordered, setOrdered] = useState(false)
+
+  function placeOrder() {
+    setOrdered(true)
+    setTimeout(() => {
+      setOrdered(false)
+      setCart([])
+      setCartOpen(false)
+    }, 3000)
+  }
 
   function getQty(id) {
     return cart.find((i) => i.id === id)?.qty || 0
@@ -31,7 +41,7 @@ export default function StateDemo() {
   const totalPrice = cart.reduce((s, i) => s + i.price * i.qty, 0)
 
   return (
-    <div className="relative rounded-xl" style={{ height: '300px' }}>
+    <div className="relative rounded-xl min-h-[300px]">
       {/* Main content */}
       <div className="flex flex-col gap-3 pt-2">
         {/* Header */}
@@ -46,7 +56,7 @@ export default function StateDemo() {
               장바구니
             </button>
             <AnimatePresence>
-              {totalItems > 0 && (
+              {totalItems > 0 && !cartOpen && (
                 <motion.span
                   initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}
                   className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-black dark:bg-white rounded-full text-[9px] text-white dark:text-black flex items-center justify-center font-bold pointer-events-none"
@@ -59,7 +69,7 @@ export default function StateDemo() {
         </div>
 
         {/* Product grid */}
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {catalog.map((product) => {
             const qty = getQty(product.id)
             const inCart = qty > 0
@@ -196,13 +206,44 @@ export default function StateDemo() {
                     <span className="text-xs text-black/50 dark:text-white/50">합계</span>
                     <span className="text-sm font-black text-black dark:text-white font-mono">{totalPrice.toLocaleString()}원</span>
                   </div>
-                  <button className="w-full py-2 bg-black dark:bg-white text-white dark:text-black text-xs font-semibold rounded-lg hover:opacity-90 transition-opacity">
+                  <button onClick={placeOrder} className="w-full py-2 bg-black dark:bg-white text-white dark:text-black text-xs font-semibold rounded-lg hover:opacity-90 transition-opacity">
                     주문하기
                   </button>
                 </div>
               )}
             </motion.div>
           </>
+        )}
+      </AnimatePresence>
+
+      {/* 주문 완료 모달 */}
+      <AnimatePresence>
+        {ordered && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 z-30 flex items-center justify-center bg-black/30 dark:bg-black/50 rounded-xl"
+          >
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 22 }}
+              className="bg-white dark:bg-[#161616] border border-black/8 dark:border-white/10 rounded-2xl px-6 py-5 flex flex-col items-center gap-2 shadow-xl mx-4"
+            >
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 0.1, type: 'spring', stiffness: 400, damping: 15 }}
+                className="w-12 h-12 rounded-full bg-emerald-500 flex items-center justify-center text-white"
+              >
+                <Check size={26} strokeWidth={3} />
+              </motion.div>
+              <p className="text-sm font-bold text-black dark:text-white mt-1">주문 완료!</p>
+              <p className="text-xs text-black/45 dark:text-white/40">잠시 후 장바구니가 비워집니다</p>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>

@@ -19,7 +19,14 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
+  // 사이드바 열렸을 때 배경 스크롤 잠금
+  useEffect(() => {
+    document.body.style.overflow = open ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [open])
+
   return (
+    <>
     <motion.header
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
@@ -60,31 +67,68 @@ export default function Navbar() {
           {open ? <X size={18} /> : <Menu size={18} />}
         </button>
       </nav>
+    </motion.header>
 
+      {/* 모바일 사이드바 (header 밖 — 부모 transform 영향 차단) */}
       <AnimatePresence>
         {open && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-[#f9f9f7] dark:bg-[#0a0a0a] border-b border-black/[0.06] dark:border-white/[0.06]"
-          >
-            <ul className="px-6 py-4 flex flex-col gap-1">
-              {links.map((link) => (
-                <li key={link.href}>
-                  <a
-                    href={link.href}
-                    className="block px-3 py-2 text-black/50 dark:text-white/40 hover:text-black dark:hover:text-white text-sm rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-all"
-                    onClick={() => setOpen(false)}
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </motion.div>
+          <>
+            {/* 백드롭 */}
+            <motion.div
+              key="backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setOpen(false)}
+              className="md:hidden fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
+            />
+
+            {/* 사이드바 패널 (오른쪽 슬라이드) */}
+            <motion.aside
+              key="panel"
+              initial={{ x: '-100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '-100%' }}
+              transition={{ type: 'spring', stiffness: 320, damping: 34 }}
+              className="md:hidden fixed top-0 left-0 z-50 h-full w-64 max-w-[80vw] bg-[#f9f9f7] dark:bg-[#0a0a0a] border-r border-black/[0.07] dark:border-white/[0.07] shadow-2xl flex flex-col"
+            >
+              <div className="flex items-center justify-between px-5 h-[57px] border-b border-black/[0.06] dark:border-white/[0.06]">
+                <span className="font-mono text-xs tracking-[0.2em] text-black/40 dark:text-white/40 uppercase">Menu</span>
+                <button
+                  onClick={() => setOpen(false)}
+                  aria-label="닫기"
+                  className="text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white transition-colors"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <ul className="flex flex-col gap-1 px-3 py-4">
+                {links.map((link) => (
+                  <li key={link.href}>
+                    <a
+                      href={link.href}
+                      onClick={() => setOpen(false)}
+                      className="block px-4 py-3 text-black/55 dark:text-white/50 hover:text-black dark:hover:text-white text-[15px] font-medium rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-all"
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+
+              <a
+                href="#contact"
+                onClick={() => setOpen(false)}
+                className="mt-auto m-3 flex items-center justify-center px-4 py-3 rounded-lg bg-black dark:bg-white text-white dark:text-black text-sm font-semibold hover:opacity-90 transition-opacity"
+              >
+                Hire Me
+              </a>
+            </motion.aside>
+          </>
         )}
       </AnimatePresence>
-    </motion.header>
+    </>
   )
 }

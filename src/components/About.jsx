@@ -45,8 +45,7 @@ function BentoCard({ children, className = '' }) {
   )
 }
 
-function TechIcon({ tech, delay, inView }) {
-  const [hover, setHover] = useState(false)
+function TechIcon({ tech, delay, inView, active, onActivate }) {
   // nextdotjs/css 등 일부는 흰 배경에서 안 보여 다크일 때 흰색으로 보정
   const iconColor = tech.color === '#000000' ? '000000' : tech.color.replace('#', '')
   return (
@@ -54,16 +53,17 @@ function TechIcon({ tech, delay, inView }) {
       initial={{ opacity: 0, scale: 0.5 }}
       animate={inView ? { opacity: 1, scale: 1 } : {}}
       transition={{ duration: 0.4, delay, type: 'spring', stiffness: 300, damping: 20 }}
-      onMouseEnter={() => setHover(true)}
-      onMouseLeave={() => setHover(false)}
+      onMouseEnter={() => onActivate(true)}
+      onMouseLeave={() => onActivate(false)}
+      onClick={() => onActivate(!active)}
       className="relative"
     >
       <div
-        className="w-11 h-11 md:w-12 md:h-12 rounded-xl flex items-center justify-center transition-all duration-200 cursor-default"
+        className="w-11 h-11 md:w-12 md:h-12 rounded-xl flex items-center justify-center transition-all duration-200 cursor-pointer"
         style={{
-          backgroundColor: hover ? `${tech.color}1a` : 'rgba(0,0,0,0.03)',
-          boxShadow: hover ? `0 8px 18px ${tech.color}33, 0 0 0 1px ${tech.color}40` : 'none',
-          transform: hover ? 'translateY(-6px)' : 'translateY(0)',
+          backgroundColor: active ? `${tech.color}1a` : 'rgba(0,0,0,0.03)',
+          boxShadow: active ? `0 8px 18px ${tech.color}33, 0 0 0 1px ${tech.color}40` : 'none',
+          transform: active ? 'translateY(-6px)' : 'translateY(0)',
         }}
       >
         <img
@@ -73,24 +73,6 @@ function TechIcon({ tech, delay, inView }) {
           loading="lazy"
         />
       </div>
-
-      {/* hover 말풍선 */}
-      <div
-        className={`absolute left-1/2 -translate-x-1/2 bottom-full mb-3 w-max max-w-[220px] z-20 transition-all duration-200 pointer-events-none ${hover ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-1'}`}
-      >
-        <div
-          className="rounded-lg px-3 py-2 text-white shadow-lg"
-          style={{ backgroundColor: tech.color === '#000000' ? '#1a1a1a' : tech.color }}
-        >
-          <p className="text-xs font-bold leading-tight" style={tech.color === '#F7DF1E' ? { color: '#1a1a1a' } : undefined}>{tech.name}</p>
-          <p className="text-[11px] leading-snug mt-0.5 opacity-90" style={tech.color === '#F7DF1E' ? { color: '#1a1a1a' } : undefined}>{tech.desc}</p>
-        </div>
-        {/* 꼬리 */}
-        <div
-          className="w-2 h-2 rotate-45 mx-auto -mt-1"
-          style={{ backgroundColor: tech.color === '#000000' ? '#1a1a1a' : tech.color }}
-        />
-      </div>
     </motion.div>
   )
 }
@@ -98,6 +80,7 @@ function TechIcon({ tech, delay, inView }) {
 export default function About() {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
+  const [activeTech, setActiveTech] = useState(null)
 
   return (
     <section id="about" className="py-16 md:py-24 px-4 md:px-6 border-t border-black/[0.06] dark:border-white/[0.06]" ref={ref}>
@@ -143,8 +126,35 @@ export default function About() {
             <p className="font-mono text-[10px] text-black/20 dark:text-white/20 tracking-widest uppercase mb-6">Tech Stack</p>
             <div className="flex flex-wrap items-center justify-center gap-3 md:gap-4">
               {techStack.map((tech, i) => (
-                <TechIcon key={tech.name} tech={tech} delay={0.2 + i * 0.05} inView={inView} />
+                <TechIcon
+                  key={tech.name}
+                  tech={tech}
+                  delay={0.2 + i * 0.05}
+                  inView={inView}
+                  active={activeTech === tech.name}
+                  onActivate={(on) => setActiveTech(on ? tech.name : null)}
+                />
               ))}
+            </div>
+
+            {/* 활성 아이콘 설명 (행 아래 고정 영역 — 화면 밖으로 안 나감) */}
+            <div className="mt-5 min-h-[3rem] flex items-center justify-center text-center">
+              {activeTech ? (() => {
+                const t = techStack.find((x) => x.name === activeTech)
+                return (
+                  <motion.p
+                    key={activeTech}
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-sm max-w-md"
+                  >
+                    <span className="font-bold" style={{ color: t.color === '#000000' ? undefined : t.color }}>{t.name}</span>
+                    <span className="text-black/45 dark:text-white/40"> — {t.desc}</span>
+                  </motion.p>
+                )
+              })() : (
+                <p className="text-xs text-black/25 dark:text-white/25">아이콘에 마우스를 올리거나 탭하면 설명이 나와요</p>
+              )}
             </div>
           </BentoCard>
         </motion.div>

@@ -15,7 +15,7 @@ function MockPage({ isDesktop, isMobile }) {
   return (
     <div className="w-full bg-[#f9f9f7] overflow-hidden flex flex-col" style={{ fontSize: isMobile ? '5px' : '6px' }}>
       <div className="flex items-center justify-between px-3 py-2 bg-white border-b border-black/5 flex-shrink-0">
-        <div className="font-bold text-black font-mono" style={{ fontSize: '7px' }}>&lt;JJB/&gt;</div>
+        <div className="font-black text-black tracking-tight" style={{ fontSize: '8px' }}>Portfolio</div>
         {!isMobile ? (
           <div className="flex gap-3 text-black/40">
             <span>About</span><span>Skills</span><span>Projects</span><span>Contact</span>
@@ -62,13 +62,13 @@ function MockPage({ isDesktop, isMobile }) {
       </div>
 
       <div className={`grid ${isDesktop ? 'grid-cols-2' : 'grid-cols-1'} gap-1.5 px-3 pb-3`}>
-        {['Project 1', 'Project 2', 'Project 3', 'Project 4'].map((s) => (
+        {['마인드룸 어드민', '뉴진스', 'Artistry', 'wmux'].map((s) => (
           <div key={s} className="bg-white rounded border border-black/6 p-1.5">
             <div className="flex items-center gap-1 mb-1">
               <div className="w-3 h-3 rounded bg-black/8" />
               <div className="font-semibold text-black">{s}</div>
             </div>
-            <div className="text-black/30 leading-relaxed mb-1">프로젝트 설명이 들어가는 자리입니다.</div>
+            <div className="text-black/30 leading-relaxed mb-1">반응형으로 동작하는 프로젝트 카드입니다.</div>
             <div className="flex gap-1">
               <div className="px-1 py-0.5 bg-black/5 border border-black/8 text-black/30 rounded" style={{ fontSize: '4px' }}>React</div>
               <div className="px-1 py-0.5 bg-black/5 border border-black/8 text-black/30 rounded" style={{ fontSize: '4px' }}>TS</div>

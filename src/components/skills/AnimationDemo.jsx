@@ -25,7 +25,7 @@ function MagneticDemo() {
   function reset() { mx.set(0); my.set(0) }
 
   return (
-    <div onMouseMove={onMove} onMouseLeave={reset} className="relative w-full h-[240px] flex items-center justify-center overflow-hidden">
+    <div onMouseMove={onMove} onMouseLeave={reset} className="relative w-full min-h-[220px] flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0 opacity-60"
         style={{ backgroundImage: 'radial-gradient(circle, rgba(120,120,140,0.16) 1px, transparent 1px)', backgroundSize: '22px 22px' }} />
       <motion.div style={{ x: rx, y: ry }} className="absolute w-32 h-32 rounded-full border border-black/15 dark:border-white/15 pointer-events-none" />
@@ -37,7 +37,10 @@ function MagneticDemo() {
       >
         <span className="absolute top-3 left-4 w-7 h-4 rounded-full bg-white/70 blur-md" />
       </motion.div>
-      <span className="absolute bottom-2 text-xs text-black/30 dark:text-white/30">영역 안에서 마우스를 움직여보세요</span>
+      <span className="absolute bottom-2 text-xs text-black/30 dark:text-white/30 text-center px-4">
+        <span className="hidden md:inline">영역 안에서 마우스를 움직여보세요</span>
+        <span className="md:hidden">마우스 기반 효과예요 · PC에서 확인해보세요</span>
+      </span>
     </div>
   )
 }
@@ -100,7 +103,10 @@ function TiltDemo() {
           backgroundPosition: sweepPos,
         }} />
       </motion.div>
-      <span className="text-xs text-black/30 dark:text-white/30">카드 위에서 마우스를 움직여보세요</span>
+      <span className="text-xs text-black/30 dark:text-white/30 text-center px-4">
+        <span className="hidden md:inline">카드 위에서 마우스를 움직여보세요</span>
+        <span className="md:hidden">마우스 기반 효과예요 · PC에서 확인해보세요</span>
+      </span>
     </div>
   )
 }
@@ -119,16 +125,16 @@ function TagsDemo() {
   function remove(t) { setTags((ts) => ts.filter((x) => x !== t)) }
 
   return (
-    <div className="w-full h-[240px] flex flex-col items-center justify-center gap-5">
+    <div className="w-full min-h-[220px] flex flex-col items-center justify-center gap-4 px-1">
       <div className="w-full max-w-md">
         <form onSubmit={add} className="flex gap-2 mb-4">
           <input
             value={val}
             onChange={(e) => setVal(e.target.value)}
             placeholder="기술 스택 입력 후 Enter"
-            className="flex-1 bg-black/[0.03] dark:bg-white/[0.05] border border-black/10 dark:border-white/10 rounded-lg px-3.5 py-2.5 text-sm text-black dark:text-white placeholder-black/30 dark:placeholder-white/30 focus:outline-none focus:border-black/30 dark:focus:border-white/30 transition-colors"
+            className="flex-1 min-w-0 bg-black/[0.03] dark:bg-white/[0.05] border border-black/10 dark:border-white/10 rounded-lg px-3 py-2 text-sm text-black dark:text-white placeholder-black/30 dark:placeholder-white/30 focus:outline-none focus:border-black/30 dark:focus:border-white/30 transition-colors"
           />
-          <button className="px-4 py-2.5 bg-black dark:bg-white text-white dark:text-black text-sm font-medium rounded-lg hover:opacity-90 transition-opacity">추가</button>
+          <button className="px-3.5 py-2 bg-black dark:bg-white text-white dark:text-black text-sm font-medium rounded-lg hover:opacity-90 transition-opacity flex-shrink-0">추가</button>
         </form>
         <motion.div layout className="flex flex-wrap gap-2 min-h-[40px] items-start">
           <AnimatePresence mode="popLayout">
@@ -141,10 +147,10 @@ function TagsDemo() {
                 exit={{ opacity: 0, scale: 0.6 }}
                 transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                 onClick={() => remove(t)}
-                className="group flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-black dark:bg-white text-white dark:text-black text-xs font-medium"
+                className="group flex items-center gap-1 px-2.5 py-1 md:px-3 md:py-1.5 rounded-full bg-black dark:bg-white text-white dark:text-black text-[11px] md:text-xs font-medium"
               >
                 {t}
-                <X size={12} className="opacity-50 group-hover:opacity-100 transition-opacity" />
+                <X size={11} className="opacity-50 group-hover:opacity-100 transition-opacity" />
               </motion.button>
             ))}
           </AnimatePresence>
@@ -187,20 +193,20 @@ const STATS = [
 function CountDemo() {
   const [run, setRun] = useState(0)
   return (
-    <div className="w-full h-[240px] flex flex-col items-center justify-center gap-6">
-      <div key={run} onClick={() => setRun((r) => r + 1)} className="grid grid-cols-3 gap-3 md:gap-4 w-full max-w-lg cursor-pointer select-none">
+    <div className="w-full min-h-[220px] flex flex-col items-center justify-center gap-6">
+      <div key={run} onClick={() => setRun((r) => r + 1)} className="grid grid-cols-1 sm:grid-cols-3 gap-2 md:gap-4 w-full max-w-lg cursor-pointer select-none">
         {STATS.map((s) => (
-          <div key={s.label} className="relative rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-white/5 px-4 py-4 overflow-hidden shadow-sm">
-            <span className="absolute top-0 left-0 w-10 h-0.5 bg-black/70 dark:bg-white/70" />
-            <div className="flex items-baseline gap-0.5">
+          <div key={s.label} className="relative rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-white/5 px-4 py-3 md:py-4 overflow-hidden shadow-sm flex sm:block items-baseline justify-between gap-2">
+            <span className="absolute top-0 left-0 w-8 md:w-10 h-0.5 bg-black/70 dark:bg-white/70" />
+            <div className="flex items-baseline gap-0.5 order-2 sm:order-none">
               <span className="text-2xl md:text-4xl font-black tracking-tight text-black dark:text-white">
                 <Odometer value={s.value} />
               </span>
-              <span className="text-lg font-black text-black/40 dark:text-white/40">{s.suffix}</span>
+              <span className="text-base md:text-lg font-black text-black/40 dark:text-white/40">{s.suffix}</span>
             </div>
-            <div className="flex items-center justify-between mt-2">
-              <span className="text-[11px] text-black/40 dark:text-white/40">{s.label}</span>
-              <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">{s.trend}</span>
+            <div className="flex items-center gap-2 sm:justify-between sm:mt-2 order-1 sm:order-none">
+              <span className="text-xs md:text-[11px] text-black/45 dark:text-white/40">{s.label}</span>
+              <span className="text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 flex-shrink-0">{s.trend}</span>
             </div>
           </div>
         ))}
@@ -238,7 +244,7 @@ export default function AnimationDemo() {
       </div>
 
       {/* Demo area */}
-      <div className="relative rounded-xl border border-black/[0.07] dark:border-white/[0.07] bg-gradient-to-b from-black/[0.02] to-transparent dark:from-white/[0.03] p-6 min-h-[300px] flex items-center justify-center overflow-hidden">
+      <div className="relative rounded-xl border border-black/[0.07] dark:border-white/[0.07] bg-gradient-to-b from-black/[0.02] to-transparent dark:from-white/[0.03] p-4 md:p-6 min-h-[280px] md:min-h-[300px] flex items-center justify-center overflow-hidden">
         <AnimatePresence mode="wait">
           <motion.div
             key={tab}

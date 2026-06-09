@@ -102,7 +102,7 @@ export default function Skills() {
               </div>
             </div>
 
-            <div className="p-5 md:p-8" style={{ minHeight: '440px' }}>
+            <div className="p-4 sm:p-5 md:p-8 min-h-[360px] md:min-h-[440px]">
               <motion.div
                 key={active}
                 initial={{ opacity: 0, y: 8 }}
