@@ -8,27 +8,47 @@ const GithubIcon = () => (
   </svg>
 )
 
-const LinkedinIcon = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-  </svg>
-)
-
 const socials = [
-  { icon: GithubIcon, label: 'GitHub', href: '#', handle: '@username' },
-  { icon: LinkedinIcon, label: 'LinkedIn', href: '#', handle: 'linkedin.com/in/...' },
-  { icon: Mail, label: 'Email', href: 'mailto:your@email.com', handle: 'your@email.com' },
+  { icon: GithubIcon, label: 'GitHub', href: 'https://github.com/junbeom09', handle: 'github.com/junbeom09' },
+  { icon: Mail, label: 'Email', href: 'mailto:qoddkfdl@gmail.com', handle: 'qoddkfdl@gmail.com' },
 ]
+
+const WEB3FORMS_KEY = 'f6ddd471-10a7-4006-b7c8-e5a537c7118b'
 
 export default function Contact() {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
-  const [sent, setSent] = useState(false)
+  const [status, setStatus] = useState('idle') // idle | sending | sent | error
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
-    setSent(true)
-    setTimeout(() => setSent(false), 3000)
+    if (status === 'sending') return
+    setStatus('sending')
+
+    const formEl = e.target
+    const formData = new FormData(formEl)
+    formData.append('access_key', WEB3FORMS_KEY)
+    formData.append('subject', '[포트폴리오] ' + (formData.get('subject') || '문의'))
+    formData.append('from_name', '포트폴리오 문의')
+
+    try {
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        body: formData,
+      })
+      const data = await res.json()
+      if (data.success) {
+        setStatus('sent')
+        formEl.reset()
+        setTimeout(() => setStatus('idle'), 4000)
+      } else {
+        setStatus('error')
+        setTimeout(() => setStatus('idle'), 4000)
+      }
+    } catch {
+      setStatus('error')
+      setTimeout(() => setStatus('idle'), 4000)
+    }
   }
 
   return (
@@ -50,15 +70,16 @@ export default function Contact() {
             transition={{ duration: 0.5, delay: 0.05 }}
           >
             <h2 className="text-3xl md:text-4xl font-black text-black dark:text-white tracking-tight mb-3 md:mb-4 leading-tight">
-              함께<br />일해요
+              무엇이든<br />물어보세요
             </h2>
             <p className="text-black/35 dark:text-white/30 text-sm leading-relaxed mb-6 md:mb-8">
-              [연락 관련 소개 문구 작성 예정]
+              포트폴리오에 대한 피드백, 협업 문의, 가벼운 커피챗 모두 환영해요.
+              메일이나 아래 폼으로 편하게 연락 주세요.
             </p>
 
             <div className="flex flex-col gap-2">
               {socials.map(({ icon: Icon, label, href, handle }) => (
-                <a key={label} href={href}
+                <a key={label} href={href} target="_blank" rel="noopener noreferrer"
                   className="group flex items-center gap-3 px-4 py-3 rounded-xl border border-black/[0.07] dark:border-white/[0.07] bg-white dark:bg-white/[0.03] hover:border-black/15 dark:hover:border-white/15 hover:shadow-sm transition-all duration-200"
                 >
                   <span className="text-black/30 dark:text-white/30 group-hover:text-black/60 dark:group-hover:text-white/60 transition-colors flex-shrink-0">
@@ -84,34 +105,42 @@ export default function Contact() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div className="flex flex-col gap-1.5">
                     <label className="font-mono text-[10px] text-black/25 dark:text-white/25 tracking-widest uppercase">이름</label>
-                    <input type="text" required placeholder="Hong Gildong"
+                    <input type="text" name="name" required placeholder="홍길동"
                       className="bg-black/[0.02] dark:bg-white/[0.04] border border-black/8 dark:border-white/8 rounded-lg px-3.5 py-2.5 text-sm text-black dark:text-white placeholder-black/20 dark:placeholder-white/20 focus:outline-none focus:border-black/25 dark:focus:border-white/25 transition-colors"
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
                     <label className="font-mono text-[10px] text-black/25 dark:text-white/25 tracking-widest uppercase">이메일</label>
-                    <input type="email" required placeholder="hello@example.com"
+                    <input type="email" name="email" required placeholder="hello@example.com"
                       className="bg-black/[0.02] dark:bg-white/[0.04] border border-black/8 dark:border-white/8 rounded-lg px-3.5 py-2.5 text-sm text-black dark:text-white placeholder-black/20 dark:placeholder-white/20 focus:outline-none focus:border-black/25 dark:focus:border-white/25 transition-colors"
                     />
                   </div>
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="font-mono text-[10px] text-black/25 dark:text-white/25 tracking-widest uppercase">제목</label>
-                  <input type="text" required placeholder="프로젝트 협업 제안"
+                  <input type="text" name="subject" required placeholder="프로젝트 협업 제안"
                     className="bg-black/[0.02] dark:bg-white/[0.04] border border-black/8 dark:border-white/8 rounded-lg px-3.5 py-2.5 text-sm text-black dark:text-white placeholder-black/20 dark:placeholder-white/20 focus:outline-none focus:border-black/25 dark:focus:border-white/25 transition-colors"
                   />
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="font-mono text-[10px] text-black/25 dark:text-white/25 tracking-widest uppercase">메시지</label>
-                  <textarea required rows={4} placeholder="안녕하세요! ..."
+                  <textarea name="message" required rows={4} placeholder="안녕하세요! ..."
                     className="bg-black/[0.02] dark:bg-white/[0.04] border border-black/8 dark:border-white/8 rounded-lg px-3.5 py-2.5 text-sm text-black dark:text-white placeholder-black/20 dark:placeholder-white/20 focus:outline-none focus:border-black/25 dark:focus:border-white/25 transition-colors resize-none"
                   />
                 </div>
-                <button type="submit"
-                  className="flex items-center justify-center gap-2 px-5 py-2.5 bg-black dark:bg-white text-white dark:text-black text-sm font-semibold rounded-lg hover:bg-black/85 dark:hover:bg-white/90 transition-colors"
+                {/* 스팸 방지 honeypot */}
+                <input type="checkbox" name="botcheck" className="hidden" style={{ display: 'none' }} tabIndex={-1} autoComplete="off" />
+                <button type="submit" disabled={status === 'sending'}
+                  className="flex items-center justify-center gap-2 px-5 py-2.5 bg-black dark:bg-white text-white dark:text-black text-sm font-semibold rounded-lg hover:bg-black/85 dark:hover:bg-white/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  {sent ? '전송됐어요 ✓' : <><Send size={13} />보내기</>}
+                  {status === 'sending' ? '보내는 중…'
+                    : status === 'sent' ? '전송됐어요 ✓'
+                    : status === 'error' ? '실패했어요 · 다시 시도'
+                    : <><Send size={13} />보내기</>}
                 </button>
+                {status === 'error' && (
+                  <p className="text-xs text-red-500/80 text-center">전송에 실패했어요. 메일(qoddkfdl@gmail.com)로 직접 보내주셔도 돼요.</p>
+                )}
               </form>
             </div>
           </motion.div>
