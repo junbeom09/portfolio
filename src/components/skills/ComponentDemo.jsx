@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Link2, Mail, MapPin, Check } from 'lucide-react'
+import { Link2, Mail, MapPin, Check, User } from 'lucide-react'
 
 const ACCENTS = [
   { name: 'Ink', value: '#1f2937' },
@@ -105,15 +105,27 @@ export default function ComponentDemo() {
           style={{ borderRadius: radius + 4 }}
         >
           {/* accent 헤더 */}
-          <motion.div layout className={banner ? 'h-14' : 'h-20'} style={{ background: `linear-gradient(135deg, ${accent}, ${accent}bb)` }} />
+          <motion.div
+            layout
+            className={`relative overflow-hidden ${banner ? 'h-14' : 'h-20'}`}
+            style={{
+              background: `radial-gradient(circle at 25% 0%, ${accent}ff, ${accent}cc 40%, ${accent}66 75%, ${accent}33), linear-gradient(135deg, ${accent} 0%, ${accent}aa 100%)`,
+            }}
+          >
+            {/* 밝은 하이라이트 스윕 */}
+            <div
+              className="absolute inset-0"
+              style={{ background: `linear-gradient(115deg, rgba(255,255,255,0.35) 0%, transparent 35%, transparent 65%, rgba(0,0,0,0.18) 100%)` }}
+            />
+          </motion.div>
 
           <div className={`px-5 ${banner ? 'flex items-center gap-4' : 'flex flex-col items-center'}`}>
             <motion.div
               layout
-              className={`flex items-center justify-center font-black text-white flex-shrink-0 ring-[3px] ring-white dark:ring-[#1a1a1a] ${banner ? 'w-14 h-14 text-lg -mt-7' : 'w-20 h-20 text-2xl -mt-10'}`}
-              style={{ background: accent, borderRadius: radius, boxShadow: '0 2px 8px rgba(0,0,0,0.12)' }}
+              className={`relative z-10 flex items-center justify-center text-white flex-shrink-0 border-4 border-white dark:border-[#1a1a1a] ${banner ? 'w-14 h-14 -mt-6' : 'w-20 h-20 -mt-8'}`}
+              style={{ background: accent, borderRadius: radius, boxShadow: '0 4px 12px rgba(0,0,0,0.18)' }}
             >
-              JB
+              <User size={banner ? 22 : 30} strokeWidth={2.2} />
             </motion.div>
 
             <div className={`min-w-0 ${banner ? 'text-left flex-1' : 'text-center mt-3'}`}>

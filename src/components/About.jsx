@@ -116,8 +116,8 @@ export default function About() {
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.5, delay: 0.05 + i * 0.08 }}
             >
-              <BentoCard className="h-full flex flex-col">
-                <span className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-black/[0.04] dark:bg-white/[0.06] text-black/70 dark:text-white/70 mb-4">
+              <BentoCard className="group h-full flex flex-col transition-all duration-300 hover:-translate-y-1 hover:!border-black/25 dark:hover:!border-white/25 hover:shadow-xl hover:shadow-black/[0.06] dark:hover:shadow-black/40">
+                <span className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-black/[0.04] dark:bg-white/[0.06] text-black/70 dark:text-white/70 mb-4 transition-all duration-300 group-hover:bg-black group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-black group-hover:scale-110">
                   <v.Icon size={20} strokeWidth={1.75} />
                 </span>
                 <h3 className="text-base md:text-lg font-bold text-black dark:text-white tracking-tight mb-2">

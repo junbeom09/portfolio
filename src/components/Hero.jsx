@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { ArrowUpRight, Mail } from 'lucide-react'
+import { ArrowUpRight, Mail, Lightbulb, LightbulbOff } from 'lucide-react'
 import { useTheme } from '../context/ThemeContext'
 
 const GithubIcon = () => (
@@ -9,7 +9,7 @@ const GithubIcon = () => (
 )
 
 export default function Hero() {
-  const { isDark } = useTheme()
+  const { isDark, toggleDark } = useTheme()
 
   return (
     <section className="relative min-h-screen flex flex-col justify-center px-4 md:px-6 pt-24 pb-12 overflow-hidden">
@@ -30,10 +30,31 @@ export default function Hero() {
               transition={{ duration: 0.4 }}
               className="flex items-center gap-2 mb-6 md:mb-8"
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="font-mono text-black/35 dark:text-white/30 text-xs tracking-widest uppercase">
-                Available for work
-              </span>
+              {/* 전구 + 텍스트 — 끄면 다크모드 */}
+              <button
+                onClick={toggleDark}
+                aria-label={isDark ? '불 켜기 (라이트 모드)' : '불 끄기 (다크 모드)'}
+                title={isDark ? '불 켜기' : '불 끄기'}
+                className="group/bulb flex items-center gap-2 active:scale-95 transition-transform"
+              >
+                <span className="transition-transform group-hover/bulb:scale-110">
+                  {isDark ? (
+                    <LightbulbOff size={18} className="text-white/40" />
+                  ) : (
+                    <motion.span
+                      initial={false}
+                      animate={{ filter: ['drop-shadow(0 0 0px rgba(245,200,66,0))', 'drop-shadow(0 0 6px rgba(245,200,66,0.7))', 'drop-shadow(0 0 2px rgba(245,200,66,0.4))'] }}
+                      transition={{ duration: 1.6, repeat: Infinity }}
+                      className="inline-block text-amber-400"
+                    >
+                      <Lightbulb size={18} fill="currentColor" />
+                    </motion.span>
+                  )}
+                </span>
+                <span className="font-mono text-black/40 dark:text-white/35 group-hover/bulb:text-black/60 dark:group-hover/bulb:text-white/50 text-[13px] tracking-widest uppercase transition-colors">
+                  {isDark ? 'Lights off' : 'Available for work'}
+                </span>
+              </button>
             </motion.div>
 
             <motion.h1
