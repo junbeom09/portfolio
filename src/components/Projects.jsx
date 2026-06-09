@@ -3,7 +3,7 @@ import { motion, useInView } from 'framer-motion'
 import { ArrowUpRight } from 'lucide-react'
 
 const GithubIcon = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
     <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
   </svg>
 )
@@ -50,8 +50,104 @@ const projects = [
     github: 'https://github.com/junbeom09/Artistry',
     thumb: '/project-thumbs/artistry.png',
   },
-  { id: 4, title: 'Project 4', desc: '[프로젝트 설명 작성 예정]', tags: [], year: '20XX', mockup: null, thumb: null },
 ]
+
+function ProjectRow({ project, index, inView }) {
+  const left = index % 2 === 0 // 텍스트가 왼쪽이면 이미지는 오른쪽
+  const clickable = project.mockup || project.link
+  const open = () => {
+    const dest = project.mockup || project.link
+    if (dest) window.open(dest, '_blank', 'noopener,noreferrer')
+  }
+
+  const Text = (
+    <div className={`flex flex-col justify-center ${left ? 'md:items-start md:text-left' : 'md:items-end md:text-right'}`}>
+      <h3 className="font-black text-black dark:text-white text-2xl md:text-3xl tracking-tight mb-3 leading-tight">
+        {project.title}
+      </h3>
+      <p className="text-black/45 dark:text-white/40 text-sm md:text-[15px] leading-relaxed max-w-md mb-4">
+        {project.desc}
+      </p>
+      <div className={`flex flex-wrap gap-1.5 mb-5 ${left ? '' : 'md:justify-end'}`}>
+        {project.tags.map((tag) => (
+          <span key={tag} className="text-xs px-2.5 py-1 bg-black/[0.05] dark:bg-white/[0.06] border border-black/8 dark:border-white/8 text-black/55 dark:text-white/50 rounded-md">
+            {tag}
+          </span>
+        ))}
+      </div>
+      <div className={`flex items-center gap-4 ${left ? '' : 'md:flex-row-reverse'}`}>
+        {clickable && (
+          <button
+            onClick={open}
+            className="group/btn flex items-center gap-1.5 text-sm font-semibold text-black dark:text-white"
+          >
+            {project.mockup ? '데모 보기' : 'PR 보기'}
+            <ArrowUpRight size={16} className="group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
+          </button>
+        )}
+        {project.github && (
+          <a
+            href={project.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="GitHub 저장소"
+            className="text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white transition-colors"
+          >
+            <GithubIcon />
+          </a>
+        )}
+      </div>
+    </div>
+  )
+
+  // 이미지: 카드 없이 반투명 + 텍스트 쪽으로 페이드되는 그라데이션 마스크
+  const fadeDir = left ? 'to left' : 'to right' // 텍스트(가운데)쪽으로 사라지게
+  const Image = (
+    <div
+      onClick={open}
+      className={`group/img relative w-full ${clickable ? 'cursor-pointer' : ''}`}
+    >
+      <img
+        src={project.thumb}
+        alt={project.title}
+        loading="lazy"
+        className="w-full h-auto object-contain rounded-xl opacity-65 group-hover/img:opacity-90 transition-all duration-500 group-hover/img:scale-[1.03]"
+        style={{
+          filter: project.lightenThumb ? 'brightness(1.7) saturate(0.9)' : undefined,
+          WebkitMaskImage: `linear-gradient(${fadeDir}, transparent 0%, rgba(0,0,0,0.3) 14%, #000 45%)`,
+          maskImage: `linear-gradient(${fadeDir}, transparent 0%, rgba(0,0,0,0.3) 14%, #000 45%)`,
+        }}
+      />
+    </div>
+  )
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 30 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.55, delay: index * 0.1 }}
+      className="relative md:grid md:grid-cols-2 md:gap-16 items-center"
+    >
+      {/* 타임라인 노드 + 연도 (가운데 라인 위) */}
+      <div className="hidden md:flex absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 z-10 flex-col items-center">
+        <span className="w-3.5 h-3.5 rounded-full bg-black dark:bg-white ring-4 ring-[#f9f9f7] dark:ring-[#0a0a0a]" />
+        <span className="mt-2 font-mono text-[11px] text-black/35 dark:text-white/35 whitespace-nowrap">{project.year}</span>
+      </div>
+
+      {left ? (
+        <>
+          {Text}
+          {Image}
+        </>
+      ) : (
+        <>
+          <div className="md:order-1 order-2">{Image}</div>
+          <div className="md:order-2 order-1">{Text}</div>
+        </>
+      )}
+    </motion.div>
+  )
+}
 
 export default function Projects() {
   const ref = useRef(null)
@@ -64,96 +160,21 @@ export default function Projects() {
           initial={{ opacity: 0, y: 10 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.4 }}
-          className="flex items-end justify-between mb-8 md:mb-10"
+          className="flex items-end justify-between mb-12 md:mb-16"
         >
           <span className="font-mono text-black/25 dark:text-white/20 text-xs tracking-widest uppercase">Projects</span>
           <span className="font-mono text-black/15 dark:text-white/15 text-xs">{projects.length} works</span>
         </motion.div>
 
-        <div className="flex flex-col gap-3 md:gap-4">
-          {projects.map((project, i) => (
-            <motion.article
-              key={project.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.5, delay: i * 0.08 }}
-              onClick={() => {
-                const dest = project.mockup || project.link
-                if (dest) window.open(dest, '_blank', 'noopener,noreferrer')
-              }}
-              className={`group relative rounded-2xl border border-black/[0.08] dark:border-white/[0.08] bg-white dark:bg-[#111] overflow-hidden transition-all duration-300 hover:border-black/20 dark:hover:border-white/20 hover:shadow-lg ${project.mockup || project.link ? 'cursor-pointer' : ''}`}
-            >
-              {/* 배경 이미지 (타이틀 영역 아래부터) */}
-              {project.thumb && (
-                <>
-                  <div className="absolute inset-x-0 bottom-0 top-20 md:top-24 overflow-hidden">
-                    <div
-                      className={`absolute inset-0 bg-cover bg-top group-hover:scale-105 transition-all duration-500 ${project.lightenThumb ? 'opacity-50 group-hover:opacity-55' : 'opacity-60 group-hover:opacity-75'}`}
-                      style={{
-                        backgroundImage: `url(${project.thumb})`,
-                        transformOrigin: 'bottom',
-                        filter: project.lightenThumb ? 'brightness(1.85) saturate(0.85)' : undefined,
-                      }}
-                    />
-                  </div>
-                  {/* 가독성용 그라데이션 오버레이 */}
-                  <div className={`absolute inset-x-0 bottom-0 top-20 md:top-24 bg-gradient-to-r dark:from-[#111] dark:via-[#111]/80 dark:to-[#111]/20 ${project.lightenThumb ? 'from-white via-white/85 to-white/40' : 'from-white via-white/80 to-white/20'}`} />
-                  {/* 상단 텍스트 보호용 세로 그라데이션 */}
-                  <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-white via-white/70 to-transparent dark:from-[#111] dark:via-[#111]/70" />
-                </>
-              )}
+        <div className="relative">
+          {/* 가운데 세로 타임라인 라인 (데스크톱) */}
+          <div className="hidden md:block absolute left-1/2 -translate-x-1/2 top-2 bottom-2 w-px bg-black/[0.1] dark:bg-white/[0.1]" />
 
-              {/* 콘텐츠 */}
-              <div className={`relative p-6 md:p-9 flex flex-col justify-between ${project.thumb ? 'min-h-[320px] md:min-h-[400px]' : 'min-h-[200px]'}`}>
-                <div>
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <span className="font-mono text-black/25 dark:text-white/25 text-sm">{String(i + 1).padStart(2, '0')}</span>
-                      <h3 className="font-bold text-black dark:text-white text-xl md:text-2xl tracking-tight">{project.title}</h3>
-                    </div>
-                    <div className="flex items-center gap-3 flex-shrink-0">
-                      {project.github && (
-                        <a
-                          href={project.github}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          aria-label="GitHub 저장소"
-                          onClick={(e) => e.stopPropagation()}
-                          className="text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white transition-colors"
-                        >
-                          <GithubIcon />
-                        </a>
-                      )}
-                      {(project.mockup || project.link) && (
-                        <span className="flex items-center gap-1 text-xs font-medium text-black/40 dark:text-white/40 group-hover:text-black dark:group-hover:text-white transition-colors">
-                          {project.mockup ? '데모 보기' : 'PR 보기'}
-                          <ArrowUpRight size={15} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  <p className="text-black/45 dark:text-white/40 text-sm md:text-[15px] leading-relaxed max-w-2xl pl-7">
-                    {project.desc}
-                  </p>
-                </div>
-
-                <div className="flex items-end justify-between pl-7 mt-5">
-                  <div className="flex flex-wrap gap-1.5">
-                    {project.tags.length > 0
-                      ? project.tags.map((tag) => (
-                          <span key={tag} className="text-xs px-2.5 py-1 bg-black/[0.05] dark:bg-white/[0.07] border border-black/8 dark:border-white/8 text-black/55 dark:text-white/50 rounded-md backdrop-blur-sm">
-                            {tag}
-                          </span>
-                        ))
-                      : <span className="text-xs text-black/20 dark:text-white/20 italic">태그 추가 예정</span>
-                    }
-                  </div>
-                  <span className="font-mono text-black/25 dark:text-white/25 text-sm">{project.year}</span>
-                </div>
-              </div>
-            </motion.article>
-          ))}
+          <div className="flex flex-col gap-16 md:gap-24">
+            {projects.map((project, i) => (
+              <ProjectRow key={project.id} project={project} index={i} inView={inView} />
+            ))}
+          </div>
         </div>
       </div>
     </section>

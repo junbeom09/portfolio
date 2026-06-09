@@ -80,7 +80,7 @@ export default function Hero() {
               >
                 연락하기
               </a>
-              <a href="#" aria-label="GitHub" className="flex items-center justify-center w-10 h-10 border border-black/10 dark:border-white/10 text-black/35 dark:text-white/35 rounded-lg hover:border-black/25 dark:hover:border-white/25 hover:text-black dark:hover:text-white transition-all">
+              <a href="https://github.com/junbeom09" target="_blank" rel="noopener noreferrer" aria-label="GitHub" className="flex items-center justify-center w-10 h-10 border border-black/10 dark:border-white/10 text-black/35 dark:text-white/35 rounded-lg hover:border-black/25 dark:hover:border-white/25 hover:text-black dark:hover:text-white transition-all">
                 <GithubIcon />
               </a>
               <a href="#contact" aria-label="Email" className="flex items-center justify-center w-10 h-10 border border-black/10 dark:border-white/10 text-black/35 dark:text-white/35 rounded-lg hover:border-black/25 dark:hover:border-white/25 hover:text-black dark:hover:text-white transition-all">
