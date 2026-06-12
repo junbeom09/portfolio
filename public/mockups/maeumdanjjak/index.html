@@ -84,7 +84,7 @@ use chrome, FireFox or Internet Explorer 11`)}var a=e(`safe-buffer`),o=e(`random
 /*$vite$:1*/</style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"></div>
   <!-- ===== 포트폴리오 데모 오버레이 (데모 칩 · UI/UX 배너 · 제작 설명) ===== -->
   <style id="pf-demo-style">
     .pf-chips-label{text-align:center;font-size:12px;color:#94a3b8;margin:2px 0 8px;font-weight:600}
@@ -135,32 +135,35 @@ use chrome, FireFox or Internet Explorer 11`)}var a=e(`safe-buffer`),o=e(`random
     var hint=document.createElement('div');hint.className='pf-hint';hint.textContent='💡 마우스를 올리면 제작 설명이 나와요';document.body.appendChild(hint);
     var tip=document.createElement('div');tip.className='pf-tip';document.body.appendChild(tip);
 
-    // [방식, 매칭값, 제목, 설명]
-    //  sel  = CSS 셀렉터
-    //  head = 정확히 일치하는 제목 텍스트 → 그 카드(조상)에 부착
-    //  btn  = 버튼/링크 텍스트 부분일치
+    // [방식, 매칭값, 제목, 설명] — 설명은 "사이트 기능"이 아니라 기술 스택·제작 방식 위주
+    //  sel    = CSS 셀렉터에 부착
+    //  head   = 정확히 일치하는 제목 텍스트 → 그 카드(조상)에 부착
+    //  btn    = 버튼/링크 텍스트 부분일치
+    //  kpis   = 상단 KPI 그리드(grid-cols-4)의 카드 전부에 부착
+    //  mapbox = path가 가장 많은 SVG(=서울 지도)를 감싼 박스에 부착(지도 인터랙션은 유지)
     var ANN=[
-      ['sel','aside','권한 기반 라우팅 · 상태관리','react-router-dom v7 — RequireAuth가 로그인 role(광역/기관)을 검증하고 미인증 시 /login으로 리다이렉트. permissions.ts로 계정유형(관리자·상담사·일반)별 메뉴·기능을 게이팅 / zustand + persist로 세션을 localStorage에 저장'],
-      ['head','서울시 자치구별 운영 현황','지도 시각화 · d3-geo','d3-geo + topojson-client로 서울 25개 자치구 경계를 SVG로 렌더링. 자치구별 위험도를 색으로 매핑하고 확대/축소·이동(zoom·pan) 인터랙션을 제공'],
-      ['head','서울시 한눈에 보기','지도 시각화 · d3-geo','d3-geo로 투영(projection)·경로(geoPath)를 계산해 자치구를 그리고, 보기 모드(지역/기관 순위) 전환과 자치구 상세를 토글'],
-      ['head','서울 전체 캐릭터 선호도','선호도 집계','자치구별 캐릭터 선호 데이터를 집계해 순위로 시각화. 지역↔기관 보기 모드를 상태로 전환'],
-      ['head','총 이용자 수','KPI 집계 카드','조회 기간 누적 지표(이용자·위험·심리점수·세션)를 요약 카드로. 기간을 바꾸면 데이터를 다시 집계해 갱신'],
-      ['head','기간별 운영 추이','시계열 차트 · recharts','recharts로 일/주/월 추이를 면적·선 차트로 시각화. 조회 기간 길이에 맞춰 버킷(일/주/월)을 자동 계산(7일 미만은 안내)'],
-      ['head','성별 분포','범주형 차트 · recharts','recharts 도넛 차트로 성별 구성비를 시각화. 차트↔표 토글을 지원'],
-      ['head','연령별 분포','범주형 차트 · recharts','recharts 막대 차트로 연령대 분포를 시각화'],
-      ['head','감지된 심리 태그','상담 분석 결과','상담 본문에서 추출된 심리 태그를 칩으로 표시. 민감정보라 권한·동의 상태에 따라 노출을 제어'],
-      ['head','상담 내용','개인정보 게이팅','상담 본문은 상담사 권한 + 내담자 동의가 있을 때만 열람 가능. 그 외에는 본문을 잠금(비공개) 처리'],
-      ['head','심리 점수','측정 데이터','회차별 심리 점수를 표시(측정 없음 케이스 처리 포함)'],
-      ['head','관리자 목록','서버형 목록 · 반응형','이름 검색·상태 필터를 적용한 목록. 데스크톱은 표, 모바일은 카드 뷰. 최고 관리자는 "내 계정"으로 표시되어 삭제 불가'],
-      ['head','가입 코드','초대 코드 발급','신규 관리자 초대를 위한 가입 코드를 발급·표시'],
-      ['sel','.recharts-wrapper','데이터 시각화 · recharts','recharts로 비율·추이·분포를 차트로 렌더링. 반응형 컨테이너로 크기에 맞춰 다시 그림'],
-      ['sel','table','반응형 레이아웃','데스크톱은 표, 모바일(360px)에선 같은 데이터를 카드 뷰로 자동 전환 / 태블릿 세로(<1024px)는 사이드바를 드로어로'],
-      ['btn','엑셀 내보내기','엑셀 내보내기 · 코드 스플리팅','exceljs를 동적 import해 필요할 때만 번들을 로드하고, 서식·열너비를 포함한 .xlsx 파일을 클라이언트에서 직접 생성'],
-      ['btn','차트/표 전환','뷰 토글 상태관리','같은 데이터를 차트와 표 두 형태로 전환하는 상태 토글']
+      ['sel','aside[class*="left-0"]','권한 라우팅 · 상태관리','React 19 + TypeScript + react-router-dom v7. RequireAuth 가드가 zustand(persist→localStorage) 세션의 role(광역/기관)을 검사해 미인증 시 /login으로 리다이렉트하고, permissions.ts로 계정유형(관리자·상담사·일반)별 메뉴·기능을 게이팅'],
+      ['mapbox','','서울 지도 · d3-geo','d3-geo + topojson-client로 구현. SeoulBound.json(TopoJSON)을 topojson.feature로 GeoJSON 변환 후 geoPath로 25개 자치구를 SVG <path>로 렌더링하고, 지표를 색 스케일에 매핑 + zoom/pan 인터랙션을 처리'],
+      ['kpis','','KPI 요약 카드 · 파생 상태','props로 라벨·값·증감을 받는 재사용 카드 컴포넌트. 상단 기간 필터 상태가 바뀌면 useMemo로 누적 지표(이용자·위험·심리점수·세션)를 다시 집계해 리렌더'],
+      ['head','기간별 운영 추이','시계열 차트 · recharts','recharts AreaChart/LineChart로 렌더. 조회 기간 길이에 맞춰 일/주/월 버킷을 동적 계산하고 ResponsiveContainer로 반응형 처리(7일 미만은 안내)'],
+      ['head','성별 분포','범주형 차트 · recharts','recharts PieChart(도넛)로 구성비를 렌더하고, 차트↔표 뷰를 useState 토글로 전환'],
+      ['head','연령별 분포','범주형 차트 · recharts','recharts BarChart로 연령대 분포를 렌더'],
+      ['head','캐릭터 성장 단계','진행률 바 · 커스텀 렌더','recharts 없이 div 너비(%)로 단계 비율을 그린 커스텀 막대(transition으로 애니메이션). 단계별 인원·비율은 grid로 함께 표기'],
+      ['head','감지된 심리 태그','조건부 렌더링','추출된 태그 배열을 칩 컴포넌트로 map() 렌더. 권한·동의 플래그(props)에 따라 조건부로 노출을 제어'],
+      ['head','상담 내용','클라이언트 게이팅','상담사 권한 + 내담자 동의 플래그가 모두 참일 때만 본문을 렌더하고, 아니면 잠금 플레이스홀더로 분기'],
+      ['head','심리 점수','방어적 렌더링','회차 데이터 배열을 매핑해 표시하고, null(측정 없음) 케이스를 분기 처리'],
+      ['head','관리자 목록','반응형 목록 · 필터 상태','useState로 검색어·상태 필터를 관리해 파생 목록을 계산. Tailwind 미디어쿼리로 데스크톱 <table>↔모바일 카드 뷰를 전환하고, 본인 계정은 비교로 삭제 버튼을 비활성화'],
+      ['head','가입 코드','폼 상태 · 클립보드','초대 코드 발급 — 생성값을 상태로 관리하고 클립보드 복사 등 클라이언트 동작을 처리'],
+      ['charts','','데이터 시각화 · recharts','recharts로 비율·추이·분포를 SVG 차트로 렌더. ResponsiveContainer가 부모 크기에 맞춰 다시 그림(차트 카드 전체에 적용)'],
+      ['sel','table','반응형 레이아웃 · Tailwind','데스크톱은 <table>, 모바일(360px)에선 같은 데이터를 카드 뷰로 자동 전환. 태블릿 세로(<1024px)는 사이드바를 드로어로'],
+      ['btn','엑셀 내보내기','동적 import · exceljs','exceljs를 동적 import(코드 스플리팅)해 필요할 때만 번들을 로드하고, 서식·열너비를 포함한 .xlsx를 클라이언트에서 직접 생성·다운로드'],
+      ['btn','차트/표 전환','뷰 토글 상태','useState 토글로 같은 데이터셋을 차트/표 두 컴포넌트로 조건부 렌더']
     ];
 
     function clsOf(el){ var c=el.getAttribute&&el.getAttribute('class'); return typeof c==='string'?c:''; }
     function cardOf(el){
+      var card=el.closest&&el.closest('.card');
+      if(card) return card;
       var sec=el.closest&&el.closest('section,article');
       if(sec) return sec;
       var p=el;
@@ -173,6 +176,27 @@ use chrome, FireFox or Internet Explorer 11`)}var a=e(`safe-buffer`),o=e(`random
       el.addEventListener('mouseenter',function(){tip.innerHTML='<b>'+a[2]+'</b>'+a[3];tip.classList.add('show');});
       el.addEventListener('mousemove',function(e){var p=14,x=e.clientX+p,y=e.clientY+p,r=tip.getBoundingClientRect();if(x+r.width>innerWidth)x=e.clientX-r.width-p;if(y+r.height>innerHeight)y=e.clientY-r.height-p;tip.style.left=x+'px';tip.style.top=y+'px';});
       el.addEventListener('mouseleave',function(){tip.classList.remove('show');});
+    }
+    function bindKpis(a){
+      // KPI 카드 = .kpi-value 를 품은 .card. 각 카드 + 같은 행(부모)의 카드 형제 전부 바인딩
+      var vals=document.querySelectorAll('.kpi-value');
+      if(!vals.length)return;
+      var rows=[];
+      vals.forEach(function(v){
+        var card=v.closest&&v.closest('.card'); if(!card)return;
+        bind(card,a);
+        var row=card.parentElement;
+        if(row && rows.indexOf(row)<0){
+          rows.push(row);
+          Array.prototype.forEach.call(row.children,function(c){ if(c.classList&&c.classList.contains('card')) bind(c,a); });
+        }
+      });
+    }
+    function bindMap(a){
+      // path가 가장 많은 svg = 서울 지도(25개 자치구)
+      var svgs=document.querySelectorAll('svg'),best=null,bn=0;
+      svgs.forEach(function(s){ var n=s.querySelectorAll('path').length; if(n>bn){ bn=n; best=s; } });
+      if(best && bn>=18) bind((best.closest&&best.closest('.card'))||cardOf(best),a);
     }
     function scan(){
       injectChips();
@@ -189,6 +213,15 @@ use chrome, FireFox or Internet Explorer 11`)}var a=e(`safe-buffer`),o=e(`random
         } else if(a[0]==='btn'){
           document.querySelectorAll('button,a').forEach(function(el){
             if(!el.hasAttribute('data-pf-ann') && el.textContent.indexOf(a[1])>=0 && el.textContent.trim().length<24) bind(el,a);
+          });
+        } else if(a[0]==='kpis'){
+          bindKpis(a);
+        } else if(a[0]==='mapbox'){
+          bindMap(a);
+        } else if(a[0]==='charts'){
+          // 차트가 든 카드 전체에 부착(개별 head 설명이 먼저 잡힌 카드는 그대로 둠)
+          document.querySelectorAll('.recharts-wrapper').forEach(function(w){
+            var card=(w.closest&&w.closest('.card'))||cardOf(w); if(card) bind(card,a);
           });
         }
       }
