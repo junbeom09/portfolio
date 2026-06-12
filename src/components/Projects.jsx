@@ -12,7 +12,12 @@ const projects = [
   {
     id: 6,
     title: '마음단짝 관리자 콘솔',
-    desc: '서울시 청소년 상담·기관 운영을 위한 권한 기반 관리자 콘솔. 광역·기관·상담사 권한에 따라 대시보드·상담 내역·계정 관리 화면이 갈리며, 서울 자치구 지도와 통계 차트로 운영 현황을 시각화합니다.',
+    points: [
+      'React 19 · TypeScript · Vite · Tailwind v4 기반 SPA',
+      '권한별(광역·기관·상담사) 화면 분기 — react-router v7 가드 + permissions 게이팅',
+      'd3-geo + topojson으로 서울 자치구 지도, recharts로 운영 통계 차트',
+      'zustand(persist) 세션 관리 · exceljs 동적 import로 엑셀 출력',
+    ],
     tags: ['React', 'TypeScript', 'Recharts', 'Zustand'],
     year: '2026',
     mockup: '/mockups/maeumdanjjak/index.html',
@@ -21,7 +26,12 @@ const projects = [
   {
     id: 5,
     title: 'wmux — 오픈소스 기여',
-    desc: '터미널 멀티플렉서 wmux(Electron · TypeScript)에 기여했습니다. 한국어 사용자명에서 토큰 파일 권한이 잠기는 보안 버그를 직접 재현·해결하고, 패키징 빌드에서 브라우저 도구가 잘못된 DOM을 읽는 버그를 원인 분석부터 테스트까지 수정해 머지했습니다.',
+    points: [
+      'Electron · TypeScript 터미널 멀티플렉서에 기여',
+      '한국어 사용자명 ACL 잠금 보안 버그 해결 — whoami SID 활용 (PR #90)',
+      '패키징 빌드에서 브라우저 도구 DOM 오독 버그 수정 (PR #104)',
+      '원인 분석 → 재현 → 테스트 작성까지 직접 진행 후 머지',
+    ],
     tags: ['TypeScript', 'Electron', 'Open Source', 'Bug Fix'],
     year: '2026',
     github: 'https://github.com/openwong2kim/wmux',
@@ -33,7 +43,12 @@ const projects = [
   {
     id: 1,
     title: '마인드룸 어드민',
-    desc: '마인드룸 상담 서비스의 내부 관리자 대시보드. 기관·부스·장비(미니PC·LTE 라우터)·상담 세션을 통합 관리하고, 지역·성별·연령·고민별 상담 통계를 차트로 제공합니다.',
+    points: [
+      'Next.js 15 App Router · React 19 · TypeScript · Tailwind v4',
+      'BFF(route handler)로 백엔드 중계 · httpOnly 쿠키 인증',
+      '기관·부스·장비·상담 세션 통합 관리 (필터·검색·반응형 목록)',
+      'recharts 상담 통계 대시보드 · brand 디자인 토큰 시스템',
+    ],
     tags: ['Next.js', 'TypeScript', 'Tailwind CSS', 'Recharts'],
     year: '2026',
     mockup: '/mockups/helpteacher/index.html',
@@ -42,7 +57,11 @@ const projects = [
   {
     id: 2,
     title: '뉴진스 (NEWjinS)',
-    desc: '뉴스 크롤링과 DBSCAN 군집화 기반 뉴스레터 자동화 서비스. 머신러닝(KoBERT·KoBART)으로 가짜뉴스 판별·본문 요약을 제공하고, 언론사 구독과 카테고리별 모아보기를 구현했습니다.',
+    points: [
+      '뉴스 크롤링(Selenium) → KoBERT 임베딩 → DBSCAN 군집화 파이프라인',
+      'KoBART 본문 요약 · 파인튜닝 BERT로 가짜뉴스 판별 모델 구축',
+      'React 프론트 · Spring Boot REST API · MySQL 적재',
+    ],
     tags: ['React', 'Spring Boot', 'MySQL', 'PyTorch'],
     year: '2024',
     mockup: '/mockups/newjins/index.html',
@@ -52,7 +71,11 @@ const projects = [
   {
     id: 3,
     title: 'Artistry',
-    desc: '미술 프리랜서와 의뢰자를 연결하는 매칭 플랫폼. 작품 포트폴리오 게시와 카테고리 탐색, 1:1 채팅 의뢰, 카카오페이 결제, 소셜 로그인을 제공합니다.',
+    points: [
+      'Webflow 디자인을 JSP/Servlet 동적 페이지로 구현',
+      'Java + MyBatis로 Oracle 연동 · 도메인 매핑',
+      '카카오페이 결제 · 소셜 로그인 연동',
+    ],
     tags: ['JSP/Servlet', 'Java', 'Oracle', 'MyBatis'],
     year: '2024',
     mockup: '/mockups/artistry/index.html',
@@ -76,9 +99,17 @@ function ProjectRow({ project, index, inView }) {
       <h3 className="font-black text-black dark:text-white text-2xl md:text-3xl tracking-tight mb-3 leading-tight">
         {project.title}
       </h3>
-      <p className="text-black/45 dark:text-white/40 text-sm md:text-[15px] leading-relaxed max-w-md mb-4">
-        {project.desc}
-      </p>
+      <ul className="flex flex-col gap-1.5 max-w-md mb-4">
+        {project.points.map((pt, i) => (
+          <li
+            key={i}
+            className={`flex gap-2 text-black/45 dark:text-white/40 text-sm md:text-[13.5px] leading-relaxed ${left ? '' : 'md:flex-row-reverse md:text-right'}`}
+          >
+            <span className="select-none text-black/25 dark:text-white/25 leading-relaxed">–</span>
+            <span>{pt}</span>
+          </li>
+        ))}
+      </ul>
       <div className={`flex flex-wrap gap-1.5 mb-5 ${left ? '' : 'md:justify-end'}`}>
         {project.tags.map((tag) => (
           <span key={tag} className="text-xs px-2.5 py-1 bg-black/[0.05] dark:bg-white/[0.06] border border-black/8 dark:border-white/8 text-black/55 dark:text-white/50 rounded-md">
