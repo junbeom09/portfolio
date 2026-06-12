@@ -10,13 +10,13 @@ const GithubIcon = () => (
 
 const projects = [
   {
-    id: 1,
-    title: '마인드룸 어드민',
-    desc: '마인드룸 상담 서비스의 내부 관리자 대시보드. 기관·부스·장비(미니PC·LTE 라우터)·상담 세션을 통합 관리하고, 지역·성별·연령·고민별 상담 통계를 차트로 제공합니다.',
-    tags: ['Next.js', 'TypeScript', 'Tailwind CSS', 'Recharts'],
+    id: 6,
+    title: '마음단짝 관리자 콘솔',
+    desc: '서울시 청소년 상담·기관 운영을 위한 권한 기반 관리자 콘솔. 광역·기관·상담사 권한에 따라 대시보드·상담 내역·계정 관리 화면이 갈리며, 서울 자치구 지도와 통계 차트로 운영 현황을 시각화합니다.',
+    tags: ['React', 'TypeScript', 'Recharts', 'Zustand'],
     year: '2026',
-    mockup: '/mockups/helpteacher/index.html',
-    thumb: '/project-thumbs/mindroom.png',
+    mockup: '/mockups/maeumdanjjak/index.html',
+    thumb: '/project-thumbs/maeumdanjjak.png',
   },
   {
     id: 5,
@@ -29,6 +29,15 @@ const projects = [
     thumb: '/project-thumbs/wmux.png',
     lightenThumb: true,
     contribution: true,
+  },
+  {
+    id: 1,
+    title: '마인드룸 어드민',
+    desc: '마인드룸 상담 서비스의 내부 관리자 대시보드. 기관·부스·장비(미니PC·LTE 라우터)·상담 세션을 통합 관리하고, 지역·성별·연령·고민별 상담 통계를 차트로 제공합니다.',
+    tags: ['Next.js', 'TypeScript', 'Tailwind CSS', 'Recharts'],
+    year: '2026',
+    mockup: '/mockups/helpteacher/index.html',
+    thumb: '/project-thumbs/mindroom.png',
   },
   {
     id: 2,
