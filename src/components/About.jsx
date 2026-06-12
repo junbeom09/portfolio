@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { MousePointerClick, Zap, Users } from 'lucide-react'
 
@@ -45,17 +45,20 @@ function BentoCard({ children, className = '' }) {
   )
 }
 
-function TechIcon({ tech, delay, inView, active, onActivate }) {
+function TechIcon({ tech, delay, inView, active, onActivate, canHover }) {
   // nextdotjs/css 등 일부는 흰 배경에서 안 보여 다크일 때 흰색으로 보정
   const iconColor = tech.color === '#000000' ? '000000' : tech.color.replace('#', '')
+  // hover 가능 기기(데스크톱)는 hover로, 터치 기기는 tap 토글로만 동작시켜
+  // 터치 시 브라우저가 쏘는 가짜 mouseenter/leave가 click과 충돌하는 문제를 차단
+  const handlers = canHover
+    ? { onMouseEnter: () => onActivate(true), onMouseLeave: () => onActivate(false) }
+    : { onClick: () => onActivate(!active) }
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.5 }}
       animate={inView ? { opacity: 1, scale: 1 } : {}}
       transition={{ duration: 0.4, delay, type: 'spring', stiffness: 300, damping: 20 }}
-      onMouseEnter={() => onActivate(true)}
-      onMouseLeave={() => onActivate(false)}
-      onClick={() => onActivate(!active)}
+      {...handlers}
       className="relative"
     >
       <div
@@ -95,6 +98,15 @@ export default function About() {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
   const [activeTech, setActiveTech] = useState(null)
+  // 마우스(hover) 기기인지 터치 기기인지 — 입력 방식에 따라 아이콘 상호작용을 분기
+  const [canHover, setCanHover] = useState(true)
+  useEffect(() => {
+    const mq = window.matchMedia('(hover: hover)')
+    setCanHover(mq.matches)
+    const onChange = (e) => setCanHover(e.matches)
+    mq.addEventListener?.('change', onChange)
+    return () => mq.removeEventListener?.('change', onChange)
+  }, [])
 
   return (
     <section id="about" className="py-16 md:py-24 px-4 md:px-6 border-t border-black/[0.06] dark:border-white/[0.06]" ref={ref}>
@@ -147,6 +159,7 @@ export default function About() {
                   inView={inView}
                   active={activeTech === tech.name}
                   onActivate={(on) => setActiveTech(on ? tech.name : null)}
+                  canHover={canHover}
                 />
               ))}
             </div>
