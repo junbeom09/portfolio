@@ -5,5 +5,7 @@ dist
 **/.omc/
 
 # 내부 작업 문서 (개인정보 포함 — 공개 저장소에 올리지 않음)
+# 별도 비공개 레포 junbeom09/portfolio-docs 에서 관리. 새 머신: .docs/ 로 clone 후 루트로 복사.
 CLAUDE.md
 HANDOFF.md
+.docs/
