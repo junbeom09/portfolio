@@ -14,7 +14,7 @@ const ACCENTS = [
 const RADII = [
   { name: 'None', value: 0 },
   { name: 'Md', value: 12 },
-  { name: 'Full', value: 28 },
+  { name: 'Xl', value: 28 },
 ]
 
 function Control({ label, children }) {
