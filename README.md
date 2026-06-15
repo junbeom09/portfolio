@@ -2,7 +2,7 @@
 
 프론트엔드 개발자 개인 포트폴리오. 단일 페이지(스크롤형)에 소개·프로젝트·스킬·연락처를 담았습니다.
 
-🔗 **Live** — https://junbeom09-portfolio.vercel.app/
+🔗 **Live** — https://junbeom09.com/
 
 ## ✨ 특징
 

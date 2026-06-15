@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://junbeom09-portfolio.vercel.app/sitemap.xml
+Sitemap: https://junbeom09.com/sitemap.xml
