@@ -3,3 +3,7 @@ dist
 .DS_Store
 .omc/
 **/.omc/
+
+# 내부 작업 문서 (개인정보 포함 — 공개 저장소에 올리지 않음)
+CLAUDE.md
+HANDOFF.md
